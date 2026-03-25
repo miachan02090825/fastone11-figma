@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Party — Character</title>
+  <meta name="description" content="Collect and manage your Star Party characters. View SSR, SR, and R rarity heroes.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sp': {
+              'bg':      '#0f1225',
+              'sidebar': '#161a35',
+              'panel':   '#1e2348',
+              'card':    '#272d5a',
+              'hover':   '#313772',
+              'accent':  '#4858a8',
+              'border':  '#2a3060',
+              'gold':    '#f5a623',
+              'green':   '#2ed573',
+              'red':     '#ff4757',
+              'purple':  '#7c3aed',
+              'muted':   '#6b7db3',
+              'label':   '#8892b0',
+            }
+          },
+          fontFamily: { 'body': ['Nunito', 'sans-serif'] },
+        }
+      }
+    }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; }
+    body { font-family: 'Nunito', sans-serif; background: #0f1225; color: #fff; overflow-x: hidden; }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #4858a8; border-radius: 10px; }
+
+    .sidebar-link { transition: all 0.15s ease; border-radius: 8px; }
+    .sidebar-link:hover { background: rgba(72, 88, 168, 0.2); }
+    .sidebar-link.active { color: #7c9fff; font-weight: 700; }
+    .nav-icon { width: 16px; height: 16px; object-fit: contain; border-radius: 3px; flex-shrink: 0; }
+
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)} }
+    .float-anim { animation: float 3s ease-in-out infinite; }
+
+    .char-card { transition: all 0.2s ease; cursor: pointer; position: relative; border: 2px solid transparent; border-radius: 12px; overflow: hidden; }
+    .char-card:hover { transform: translateY(-3px); border-color: rgba(124,58,237,0.4); box-shadow: 0 0 15px rgba(124,58,237,0.2); }
+    .char-card.selected { border-color: #7c3aed; box-shadow: 0 0 20px rgba(124,58,237,0.4), 0 0 40px rgba(124,58,237,0.15); }
+
+    .filter-pill { transition: all 0.15s ease; cursor: pointer; }
+    .filter-pill:hover { background: rgba(72, 88, 168, 0.3); }
+    .filter-pill.active { background: #fff; color: #0f1225; }
+
+    .detail-tab { transition: all 0.15s ease; cursor: pointer; position: relative; }
+    .detail-tab:hover { color: #fff; }
+    .detail-tab.active { color: #fff; }
+    .detail-tab.active::after { content:''; position:absolute; bottom:-1px; left:0; right:0; height:2px; background:#fff; border-radius:1px; }
+
+    .star-on { color: #f5a623; }
+    .star-off { color: #3a4070; }
+
+    /* Hamburger */
+    .hamburger-btn { display: none; }
+    .sidebar-overlay { display: none; }
+
+    @media (max-width: 767px) {
+      .hamburger-btn { display: flex; }
+      #sidebar { transform: translateX(-100%); transition: transform 0.3s ease; }
+      #sidebar.open { transform: translateX(0); }
+      .sidebar-overlay.open { display: block; position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,0.5); }
+      main { margin-left: 0 !important; }
+    }
+  </style>
+</head>
+<body class="font-body">
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ===================== SIDEBAR ===================== -->
+    <aside id="sidebar" class="w-[140px] bg-sp-sidebar fixed top-0 left-0 bottom-0 z-50 flex flex-col border-r border-sp-border/40 overflow-hidden">
+      <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+        <div class="w-7 h-7 rounded-md bg-sp-panel border border-sp-border flex items-center justify-center text-xs font-black text-white/70">K</div>
+        <div class="leading-none">
+          <div class="text-[10px] font-black tracking-widest bg-gradient-to-r from-amber-400 via-rose-400 to-cyan-400 bg-clip-text text-transparent">STAR</div>
+          <div class="text-[10px] font-black tracking-widest bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent">PARTY</div>
+        </div>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto px-1.5 py-1 text-[13px] space-y-[2px]">
+        <a href="index.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/home.png" alt="" class="nav-icon opacity-70"><span>Home</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/games.png" alt="" class="nav-icon opacity-70"><span>Games</span>
+        </a>
+        <a href="character.html" class="sidebar-link active flex items-center gap-2 px-2.5 py-[6px]">
+          <img src="./assets/images/icons/character.png" alt="" class="nav-icon"><span>Character</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/gacha.png" alt="" class="nav-icon opacity-70"><span>Gacha</span>
+        </a>
+        <a href="shop.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/shop.png" alt="" class="nav-icon opacity-70"><span>Shop</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/rank.png" alt="" class="nav-icon opacity-70"><span>Rank</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/starcards.png" alt="" class="nav-icon opacity-70"><span>StarCards</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/playground.png" alt="" class="nav-icon opacity-70"><span>PlayGround</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/event.png" alt="" class="nav-icon opacity-70"><span>EventCenter</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/reward.png" alt="" class="nav-icon opacity-70"><span>RewardCenter</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/achievement.png" alt="" class="nav-icon opacity-70"><span>Achievement</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/inventory.png" alt="" class="nav-icon opacity-70"><span>Inventory</span>
+        </a>
+        <div class="border-t border-white/5 my-2"></div>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/action.png" alt="" class="nav-icon opacity-70"><span>Action</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/match.png" alt="" class="nav-icon opacity-70"><span>Match</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/puzzle.png" alt="" class="nav-icon opacity-70"><span>Puzzle</span>
+        </a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label">
+          <img src="./assets/images/icons/multiplayer.png" alt="" class="nav-icon opacity-70"><span>Multiplayer</span>
+        </a>
+      </nav>
+
+      <div class="px-1.5 pb-2 space-y-1.5">
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden">⭐ ALL-STARS</div>
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden" style="animation-delay:.4s">⭐ ALL-STARS</div>
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-pink-600 to-red-500 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden" style="animation-delay:.8s">⭐ ALL-STARS</div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN ===================== -->
+    <main class="flex-1 ml-0 md:ml-[140px] min-h-screen flex flex-col">
+
+      <!-- ── TOP BAR: Resource Pills ── -->
+      <header class="sticky top-0 z-40 bg-sp-bg/85 backdrop-blur-xl border-b border-sp-border/30">
+        <div class="flex items-center justify-between md:justify-end px-3 md:px-4 py-2 gap-2 md:gap-2.5">
+          <button class="hamburger-btn w-8 h-8 rounded-lg bg-sp-panel items-center justify-center" onclick="toggleSidebar()">
+            <span class="text-white text-sm">☰</span>
+          </button>
+          <div class="flex items-center gap-1.5 md:gap-2.5 flex-wrap justify-end">
+            <div class="flex items-center gap-1 bg-sp-panel rounded-full px-2 md:px-2.5 py-1">
+              <span class="text-[10px] md:text-[11px]">💎</span>
+              <span class="text-[11px] md:text-[12px] font-bold">1.354k</span>
+              <button class="w-[16px] h-[16px] md:w-[18px] md:h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] md:text-[9px] font-black ml-0.5">+</button>
+            </div>
+            <div class="flex items-center gap-1 bg-sp-panel rounded-full px-2 md:px-2.5 py-1">
+              <span class="text-[10px] md:text-[11px]">💚</span>
+              <span class="text-[11px] md:text-[12px] font-bold">1.854k</span>
+              <button class="w-[16px] h-[16px] md:w-[18px] md:h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] md:text-[9px] font-black ml-0.5">+</button>
+            </div>
+            <div class="flex items-center gap-1 bg-sp-panel rounded-full px-2 md:px-2.5 py-1">
+              <span class="text-[10px] md:text-[11px]">🏛️</span>
+              <span class="text-[11px] md:text-[12px] font-bold">120</span>
+              <button class="w-[16px] h-[16px] md:w-[18px] md:h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] md:text-[9px] font-black ml-0.5">+</button>
+            </div>
+            <div class="hidden md:flex items-center gap-1 bg-sp-panel rounded-full px-2.5 py-1">
+              <span class="text-[11px]">❤️</span>
+              <span class="text-[12px] font-bold">120</span>
+              <button class="w-[18px] h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[9px] font-black ml-0.5">+</button>
+            </div>
+            <div class="hidden md:flex items-center gap-1 bg-sp-panel rounded-full px-2.5 py-1">
+              <span class="text-[11px]">🍀</span>
+              <span class="text-[12px] font-bold">1.354k</span>
+              <button class="w-[18px] h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[9px] font-black ml-0.5">+</button>
+            </div>
+            <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center">
+              <img src="./assets/images/icons/gacha.png" alt="Settings" class="w-3.5 h-3.5 object-contain">
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- ── CONTENT ── -->
+      <div class="flex-1 p-3 md:p-4 flex flex-col lg:flex-row gap-3 md:gap-4">
+
+        <!-- LEFT: Grid Area -->
+        <div class="flex-1 min-w-0 flex flex-col">
+
+          <!-- Breadcrumb -->
+          <div class="text-[11px] text-sp-label mb-2">
+            <a href="index.html" class="hover:text-white transition">Home</a>
+            <span class="mx-1 opacity-50">»</span>
+            <span class="text-white font-semibold">Character</span>
+          </div>
+
+          <!-- Title + Filter Row -->
+          <div class="flex flex-col md:flex-row md:items-center justify-between mb-3 gap-2">
+            <h1 class="text-base font-bold">Character</h1>
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <span class="text-[11px] text-sp-label mr-1">Filter :</span>
+              <button class="filter-pill active rounded-full px-2.5 py-[3px] text-[11px] font-bold flex items-center gap-1" data-filter="all" onclick="setFilter(this)">🎯 ALL</button>
+              <button class="filter-pill rounded-full px-2.5 py-[3px] text-[11px] font-bold bg-sp-panel flex items-center gap-1" data-filter="gem" onclick="setFilter(this)">💎 120</button>
+              <button class="filter-pill rounded-full px-2.5 py-[3px] text-[11px] font-bold bg-sp-panel flex items-center gap-1" data-filter="crown" onclick="setFilter(this)">🏛️ 120</button>
+              <button class="filter-pill rounded-full px-2.5 py-[3px] text-[11px] font-bold bg-sp-panel flex items-center gap-1" data-filter="heart" onclick="setFilter(this)">❤️ 120</button>
+              <button class="filter-pill rounded-full px-2.5 py-[3px] text-[11px] font-bold bg-sp-panel flex items-center gap-1" data-filter="clover" onclick="setFilter(this)">🍀 120</button>
+              <button class="rounded-full w-6 h-6 bg-sp-panel flex items-center justify-center text-[10px] text-sp-label hover:bg-sp-hover transition cursor-pointer">▼</button>
+            </div>
+          </div>
+
+          <!-- Collection Stats Bar -->
+          <div class="bg-sp-panel rounded-xl px-3 py-2 flex items-center justify-between mb-3 border border-sp-border/30">
+            <div class="leading-none">
+              <div class="text-[9px] font-black tracking-widest bg-gradient-to-r from-amber-400 via-rose-400 to-cyan-400 bg-clip-text text-transparent">STAR</div>
+              <div class="text-[9px] font-black tracking-widest bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent">PARTY</div>
+            </div>
+            <div class="flex items-center gap-3 md:gap-5">
+              <div class="flex items-center gap-1.5">
+                <img src="./assets/images/icons/character.png" alt="" class="w-3 h-3 object-contain">
+                <span class="text-[11px] md:text-[12px] font-bold">113 / 116</span>
+              </div>
+              <div class="flex items-center gap-1.5">
+                <span class="text-[11px] text-sp-gold">⭐</span>
+                <span class="text-[11px] md:text-[12px] font-bold">450 / 600</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Character Grid -->
+          <div id="charGrid" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-2.5 overflow-y-auto flex-1 pr-1" style="max-height: calc(100vh - 230px);">
+            <!-- JS rendered -->
+          </div>
+        </div>
+
+        <!-- RIGHT: SSR Detail Panel -->
+        <div class="w-full lg:w-[280px] flex-shrink-0 flex flex-col mt-4 lg:mt-0">
+
+          <!-- SSR Card -->
+          <div class="relative rounded-2xl overflow-hidden mb-3">
+            <div class="h-[250px] md:h-[310px] bg-gradient-to-b from-orange-500 via-amber-500 to-yellow-600 relative">
+              <div class="absolute top-3 left-3 z-10">
+                <span class="text-2xl md:text-3xl font-black text-white/90 drop-shadow-lg" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.3);">SSR</span>
+              </div>
+              <button class="absolute top-3 right-3 w-6 h-6 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center z-10">
+                <img src="./assets/images/icons/gacha.png" alt="Settings" class="w-3 h-3 object-contain">
+              </button>
+              <div class="absolute inset-0 flex items-center justify-center pt-6">
+                <img src="./assets/images/ssr-character.png" alt="Magic Conny" class="h-full object-contain drop-shadow-2xl">
+              </div>
+              <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3 pt-10">
+                <div class="flex items-center gap-1.5 mb-0.5">
+                  <span class="text-red-300 text-sm">❤️</span>
+                  <span class="text-base md:text-lg font-black drop-shadow-lg">Magic Conny</span>
+                </div>
+                <p class="text-[10px] text-white/70 mb-1">CV : Evan Hartwell</p>
+                <div class="flex gap-0.5">
+                  <span class="star-on text-xs">⭐</span>
+                  <span class="star-on text-xs">⭐</span>
+                  <span class="star-on text-xs">⭐</span>
+                  <span class="star-on text-xs">⭐</span>
+                  <span class="star-on text-xs">⭐</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Detail Tabs -->
+          <div class="flex border-b border-white/10 mb-3">
+            <button class="detail-tab flex-1 py-2 text-[11px] font-semibold text-sp-label text-center" onclick="setTab(this)">Level</button>
+            <button class="detail-tab flex-1 py-2 text-[11px] font-semibold text-sp-label text-center" onclick="setTab(this)">Star Break</button>
+            <button class="detail-tab flex-1 py-2 text-[11px] font-semibold text-sp-label text-center" onclick="setTab(this)">Contract</button>
+            <button class="detail-tab active flex-1 py-2 text-[11px] font-semibold text-center" onclick="setTab(this)">Skin</button>
+            <button class="detail-tab flex-1 py-2 text-[11px] font-semibold text-sp-label text-center" onclick="setTab(this)">Story</button>
+          </div>
+
+          <!-- Skin Preview Card -->
+          <div class="bg-sp-panel rounded-xl p-3 mb-3 border border-sp-border/30">
+            <div class="bg-sp-card rounded-lg h-[120px] md:h-[140px] flex items-center justify-center mb-2 overflow-hidden">
+              <img src="./assets/images/ssr-character.png" alt="Skin" class="h-full object-contain opacity-90">
+            </div>
+            <p class="text-center text-[12px] font-semibold">Skin Name</p>
+          </div>
+
+          <!-- Level Up Button -->
+          <button class="w-full py-2.5 bg-sp-green hover:bg-green-600 transition rounded-xl font-bold text-[13px] shadow-lg shadow-green-900/30">
+            Level up
+          </button>
+        </div>
+
+      </div><!-- /content -->
+    </main>
+  </div>
+
+  <!-- ===================== DATA-DRIVEN CHARACTER CARDS ===================== -->
+  <script>
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+      document.getElementById('sidebarOverlay').classList.toggle('open');
+    }
+
+    /* Character images — reuse game/event scene images as full-cover backgrounds */
+    const charImgs = [
+      "./assets/images/games/hero-adventure.png",
+      "./assets/images/events/frost.png",
+      "./assets/images/events/star-crown.png",
+      "./assets/images/games/smart-buddy.png",
+      "./assets/images/events/cosmic-race.png",
+      "./assets/images/games/pixel-world.png",
+      "./assets/images/games/jigpic-solitaire.png",
+      "./assets/images/games/join-clash.png",
+      "./assets/images/events/arena-blitz.png",
+      "./assets/images/games/word-master.png",
+      "./assets/images/events/spring-fest.png",
+      "./assets/images/games/galaxy-quest.png",
+      "./assets/images/events/lucky-draw.png",
+      "./assets/images/games/pet-kingdom.png",
+      "./assets/images/events/time-warp.png",
+      "./assets/images/games/speed-racer.png",
+      "./assets/images/events/galaxy-tour.png",
+      "./assets/images/categories/action.png",
+    ];
+
+    const characters = [
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:5, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:5, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:3, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:5, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:5, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:3, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:5, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:4, shards:"29 / 30", clover:false },
+      { name:"Charm Name", lv:200, stars:5, shards:"29 / 30", clover:true  },
+      { name:"Charm Name", lv:200, stars:3, shards:"29 / 30", clover:false },
+    ];
+
+    const grid = document.getElementById('charGrid');
+    characters.forEach((c, i) => {
+      const starsHTML = Array.from({length:5}, (_, s) =>
+        `<span class="text-[9px] ${s < c.stars ? 'star-on' : 'star-off'}">⭐</span>`
+      ).join('');
+      const cloverHTML = c.clover ? `<span class="absolute top-1.5 right-1.5 w-[18px] h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] z-10 shadow">🍀</span>` : '';
+      const selected = i === 0 ? 'selected' : '';
+      const imgSrc = charImgs[i % charImgs.length];
+
+      grid.innerHTML += `
+        <div class="char-card ${selected}" onclick="selectCard(this)">
+          ${cloverHTML}
+          <div class="absolute top-1.5 left-1.5 z-10 bg-black/40 backdrop-blur-sm rounded px-1 py-[1px] flex items-baseline gap-0.5">
+            <span class="text-[7px] md:text-[8px] text-sp-label">Lv.</span>
+            <span class="text-[11px] md:text-[13px] font-black leading-none">${c.lv}</span>
+          </div>
+          <!-- FULL-COVER image background -->
+          <div class="relative h-[75px] md:h-[90px]">
+            <img src="${imgSrc}" alt="${c.name}" class="absolute inset-0 w-full h-full object-cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-sp-bg/80 via-sp-bg/20 to-transparent"></div>
+          </div>
+          <div class="flex justify-center gap-[1px] md:gap-[2px] py-1 bg-sp-bg/60">${starsHTML}</div>
+          <div class="bg-gradient-to-r from-amber-500 to-orange-500 py-1 text-center">
+            <span class="text-[10px] md:text-[11px] font-bold">${c.name}</span>
+          </div>
+          <div class="bg-sp-card py-1 flex items-center justify-center gap-1">
+            <span class="text-[8px] md:text-[9px] text-sp-label">♾️</span>
+            <span class="text-[9px] md:text-[10px] font-bold">${c.shards}</span>
+          </div>
+        </div>`;
+    });
+
+    function selectCard(el) {
+      document.querySelectorAll('.char-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function setFilter(el) {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      el.classList.add('active');
+    }
+
+    function setTab(el) {
+      document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+  </script>
+
+</body>
+</html>

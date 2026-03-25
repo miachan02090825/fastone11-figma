@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Party — Shop</title>
+  <meta name="description" content="Star Party Virtual Shop — Buy gems, loot boxes, skins, bundles and in-game items.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config={theme:{extend:{colors:{'sp':{'bg':'#0f1225','sidebar':'#161a35','panel':'#1e2348','card':'#272d5a','hover':'#313772','accent':'#4858a8','border':'#2a3060','gold':'#f5a623','green':'#2ed573','red':'#ff4757','purple':'#7c3aed','muted':'#6b7db3','label':'#8892b0'}},fontFamily:{'body':['Nunito','sans-serif']}}}}
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:14px}
+    body{font-family:'Nunito',sans-serif;background:#0f1225;color:#fff;overflow-x:hidden}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#4858a8;border-radius:10px}
+
+    .sidebar-link{transition:all .15s ease;border-radius:8px}
+    .sidebar-link:hover{background:rgba(72,88,168,.2)}
+    .sidebar-link.active{color:#7c9fff;font-weight:700}
+    .nav-icon{width:16px;height:16px;object-fit:contain;border-radius:3px;flex-shrink:0}
+
+    .img-card{position:relative;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
+    .img-card:hover{transform:translateY(-4px);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+    .img-card img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .img-card:hover img.cover{transform:scale(1.08)}
+    .img-card .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,18,37,.85) 0%,rgba(15,18,37,.3) 50%,transparent 100%)}
+
+    .shop-tab{transition:all .2s ease;cursor:pointer}
+    .shop-tab:hover{color:#fff;background:rgba(72,88,168,.2)}
+    .shop-tab.active{color:#fff;background:rgba(124,58,237,.3);border-color:#7c3aed}
+
+    .buy-btn{transition:all .15s ease}
+    .buy-btn:hover{transform:scale(1.05);filter:brightness(1.15)}
+
+    @keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    .shimmer{background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,.08) 50%,transparent 100%);background-size:200% 100%;animation:shimmer 2.5s ease-in-out infinite}
+    @keyframes pulse-glow{0%,100%{box-shadow:0 0 10px rgba(245,166,35,.3)}50%{box-shadow:0 0 25px rgba(245,166,35,.6),0 0 40px rgba(245,166,35,.2)}}
+    .pulse-gold{animation:pulse-glow 2s ease-in-out infinite}
+    @keyframes countdown-pulse{0%,100%{opacity:1}50%{opacity:.6}}
+    .countdown-blink{animation:countdown-pulse 1s ease-in-out infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    .float-anim{animation:float 3s ease-in-out infinite}
+
+    .hscroll{overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+    .hscroll::-webkit-scrollbar{height:3px}
+    .scroll-btn{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(15,18,37,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:background .2s}
+    .scroll-btn:hover{background:rgba(72,88,168,.6)}
+
+    .ribbon{position:absolute;top:12px;right:-30px;z-index:10;padding:2px 30px;font-size:10px;font-weight:800;text-transform:uppercase;transform:rotate(45deg);letter-spacing:1px}
+
+    .hamburger-btn{display:none}
+    .sidebar-overlay{display:none}
+    @media(max-width:767px){
+      .hamburger-btn{display:flex}
+      #sidebar{transform:translateX(-100%);transition:transform .3s ease}
+      #sidebar.open{transform:translateX(0)}
+      .sidebar-overlay.open{display:block;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5)}
+      main{margin-left:0!important}
+    }
+  </style>
+</head>
+<body class="font-body">
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <div class="flex min-h-screen">
+    <!-- SIDEBAR (same as index.html) -->
+    <aside id="sidebar" class="w-[140px] bg-sp-sidebar fixed top-0 left-0 bottom-0 z-50 flex flex-col border-r border-sp-border/40 overflow-hidden">
+      <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+        <div class="w-7 h-7 rounded-md bg-sp-panel border border-sp-border flex items-center justify-center text-xs font-black text-white/70">K</div>
+        <div class="leading-none">
+          <div class="text-[10px] font-black tracking-widest bg-gradient-to-r from-amber-400 via-rose-400 to-cyan-400 bg-clip-text text-transparent">STAR</div>
+          <div class="text-[10px] font-black tracking-widest bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent">PARTY</div>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto px-1.5 py-1 text-[13px] space-y-[2px]">
+        <a href="index.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/home.png" alt="" class="nav-icon opacity-70"><span>Home</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/games.png" alt="" class="nav-icon opacity-70"><span>Games</span></a>
+        <a href="character.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/character.png" alt="" class="nav-icon opacity-70"><span>Character</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/gacha.png" alt="" class="nav-icon opacity-70"><span>Gacha</span></a>
+        <a href="shop.html" class="sidebar-link active flex items-center gap-2 px-2.5 py-[6px]"><img src="./assets/images/icons/shop.png" alt="" class="nav-icon"><span>Shop</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/rank.png" alt="" class="nav-icon opacity-70"><span>Rank</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/starcards.png" alt="" class="nav-icon opacity-70"><span>StarCards</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/playground.png" alt="" class="nav-icon opacity-70"><span>PlayGround</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/event.png" alt="" class="nav-icon opacity-70"><span>EventCenter</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/reward.png" alt="" class="nav-icon opacity-70"><span>RewardCenter</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/achievement.png" alt="" class="nav-icon opacity-70"><span>Achievement</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/inventory.png" alt="" class="nav-icon opacity-70"><span>Inventory</span></a>
+        <div class="border-t border-white/5 my-2"></div>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/action.png" alt="" class="nav-icon opacity-70"><span>Action</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/match.png" alt="" class="nav-icon opacity-70"><span>Match</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/puzzle.png" alt="" class="nav-icon opacity-70"><span>Puzzle</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/multiplayer.png" alt="" class="nav-icon opacity-70"><span>Multiplayer</span></a>
+      </nav>
+      <div class="px-1.5 pb-2 space-y-1.5">
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden">⭐ ALL-STARS</div>
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden" style="animation-delay:.4s">⭐ ALL-STARS</div>
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-pink-600 to-red-500 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden" style="animation-delay:.8s">⭐ ALL-STARS</div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="flex-1 ml-0 md:ml-[140px] min-h-screen flex flex-col">
+      <!-- Top Bar -->
+      <header class="sticky top-0 z-40 bg-sp-bg/85 backdrop-blur-xl border-b border-sp-border/30">
+        <div class="flex items-center justify-between md:justify-end px-3 md:px-4 py-2 gap-2 md:gap-2.5">
+          <button class="hamburger-btn w-8 h-8 rounded-lg bg-sp-panel items-center justify-center" onclick="toggleSidebar()"><span class="text-white text-sm">☰</span></button>
+          <div class="flex items-center gap-1.5 md:gap-2.5 flex-wrap justify-end">
+            <div class="flex items-center gap-1 bg-sp-panel rounded-full px-2 md:px-2.5 py-1"><span class="text-[10px] md:text-[11px]">💎</span><span class="text-[11px] md:text-[12px] font-bold">1.354k</span><button class="w-[16px] h-[16px] md:w-[18px] md:h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] md:text-[9px] font-black ml-0.5">+</button></div>
+            <div class="flex items-center gap-1 bg-sp-panel rounded-full px-2 md:px-2.5 py-1"><span class="text-[10px] md:text-[11px]">💚</span><span class="text-[11px] md:text-[12px] font-bold">1.854k</span><button class="w-[16px] h-[16px] md:w-[18px] md:h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] md:text-[9px] font-black ml-0.5">+</button></div>
+            <div class="flex items-center gap-1 bg-sp-panel rounded-full px-2 md:px-2.5 py-1"><span class="text-[10px] md:text-[11px]">🏛️</span><span class="text-[11px] md:text-[12px] font-bold">120</span><button class="w-[16px] h-[16px] md:w-[18px] md:h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[8px] md:text-[9px] font-black ml-0.5">+</button></div>
+            <div class="hidden md:flex items-center gap-1 bg-sp-panel rounded-full px-2.5 py-1"><span class="text-[11px]">❤️</span><span class="text-[12px] font-bold">120</span><button class="w-[18px] h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[9px] font-black ml-0.5">+</button></div>
+            <div class="hidden md:flex items-center gap-1 bg-sp-panel rounded-full px-2.5 py-1"><span class="text-[11px]">🍀</span><span class="text-[12px] font-bold">1.354k</span><button class="w-[18px] h-[18px] rounded-full bg-sp-green flex items-center justify-center text-[9px] font-black ml-0.5">+</button></div>
+            <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/gacha.png" alt="" class="w-3.5 h-3.5 object-contain"></button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="flex-1 p-3 md:p-5 lg:p-6 space-y-6 md:space-y-8 lg:space-y-10 overflow-y-auto" style="max-height:calc(100vh - 52px)">
+
+        <div class="text-[11px] text-sp-label"><a href="index.html" class="hover:text-white transition">Home</a><span class="mx-1 opacity-50">»</span><span class="text-white font-semibold">Shop</span></div>
+
+        <!-- Title + Tabs -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+          <h1 class="text-base md:text-lg font-black flex items-center gap-2"><img src="./assets/images/icons/shop.png" alt="" class="w-5 h-5 object-contain"> Shop</h1>
+          <div class="flex items-center gap-1 md:gap-1.5 flex-wrap" id="shopTabs">
+            <button class="shop-tab active rounded-full px-2.5 md:px-3 py-[4px] md:py-[5px] text-[10px] md:text-[11px] font-bold border border-transparent" onclick="setShopTab(this)">🔥 Hot</button>
+            <button class="shop-tab rounded-full px-2.5 md:px-3 py-[4px] md:py-[5px] text-[10px] md:text-[11px] font-bold bg-sp-panel border border-sp-border/30" onclick="setShopTab(this)">💎 Gems</button>
+            <button class="shop-tab rounded-full px-2.5 md:px-3 py-[4px] md:py-[5px] text-[10px] md:text-[11px] font-bold bg-sp-panel border border-sp-border/30" onclick="setShopTab(this)">👗 Skins</button>
+            <button class="shop-tab rounded-full px-2.5 md:px-3 py-[4px] md:py-[5px] text-[10px] md:text-[11px] font-bold bg-sp-panel border border-sp-border/30" onclick="setShopTab(this)">🎁 Loot Box</button>
+            <button class="shop-tab rounded-full px-2.5 md:px-3 py-[4px] md:py-[5px] text-[10px] md:text-[11px] font-bold bg-sp-panel border border-sp-border/30" onclick="setShopTab(this)">🧪 Items</button>
+            <button class="shop-tab rounded-full px-2.5 md:px-3 py-[4px] md:py-[5px] text-[10px] md:text-[11px] font-bold bg-sp-panel border border-sp-border/30" onclick="setShopTab(this)">📦 Bundles</button>
+          </div>
+        </div>
+
+        <!-- Featured Banner -->
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+          <div class="md:col-span-8 img-card h-[180px] md:h-[210px] group">
+            <img src="./assets/images/shop-hero-banner.png" alt="Mega Star Bundle" class="cover">
+            <div class="overlay"></div>
+            <div class="shimmer absolute inset-0"></div>
+            <div class="ribbon bg-sp-red text-white hidden md:block">Limited</div>
+            <div class="absolute bottom-0 left-0 right-0 p-4 md:p-5 z-10">
+              <div class="flex items-center gap-1 mb-1">
+                <span class="bg-sp-red/90 text-white text-[8px] md:text-[9px] font-black px-1.5 py-[1px] rounded uppercase tracking-wider">Limited Time</span>
+                <span class="text-[9px] md:text-[10px] text-white/60 countdown-blink" id="bannerCountdown">23:59:59</span>
+              </div>
+              <h2 class="text-xl md:text-2xl font-black leading-tight drop-shadow-lg">🔥 Mega Star Bundle</h2>
+              <p class="text-[11px] md:text-[12px] text-white/70 mt-0.5 max-w-md">Get 5000 Gems + 3 SSR Loot Boxes + Exclusive "Cosmic Voyager" Skin — 70% OFF!</p>
+              <button class="mt-2 px-3 md:px-4 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full text-[11px] md:text-[12px] font-black shadow-lg pulse-gold buy-btn">💎 2,980 <span class="line-through text-white/50 ml-1 font-normal">9,980</span></button>
+            </div>
+          </div>
+          <div class="md:col-span-4 grid grid-cols-2 md:grid-rows-2 md:grid-cols-1 gap-3">
+            <div class="img-card min-h-[80px] md:min-h-0 group">
+              <img src="./assets/images/events/lucky-draw.png" alt="Daily Free Gift" class="cover">
+              <div class="overlay"></div>
+              <div class="shimmer absolute inset-0"></div>
+              <div class="absolute inset-0 flex items-center px-3 md:px-4 gap-2 md:gap-3 z-10">
+                <div class="w-[45px] h-[45px] md:w-[55px] md:h-[55px] rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform"><span class="text-xl md:text-2xl">🎁</span></div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-black text-xs md:text-sm leading-tight drop-shadow-lg">Daily Free Gift</p>
+                  <p class="text-[9px] md:text-[10px] text-white/70 mt-0.5">Claim your daily reward!</p>
+                  <span class="inline-block mt-1 bg-white text-green-700 text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-[2px] rounded-full">CLAIM NOW</span>
+                </div>
+              </div>
+            </div>
+            <div class="img-card min-h-[80px] md:min-h-0 group">
+              <img src="./assets/images/shop/gem-scene.png" alt="First Purchase" class="cover">
+              <div class="overlay"></div>
+              <div class="shimmer absolute inset-0"></div>
+              <div class="absolute inset-0 flex items-center px-3 md:px-4 gap-2 md:gap-3 z-10">
+                <div class="w-[45px] h-[45px] md:w-[55px] md:h-[55px] rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-lg group-hover:scale-110 transition-transform"><span class="text-xl md:text-2xl">👑</span></div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-black text-xs md:text-sm leading-tight drop-shadow-lg">First Purchase ×2</p>
+                  <p class="text-[9px] md:text-[10px] text-white/70 mt-0.5">Double gems on first buy!</p>
+                  <span class="inline-block mt-1 bg-gradient-to-r from-amber-400 to-orange-400 text-sp-bg text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-[2px] rounded-full">BONUS</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Deals -->
+        <div>
+          <div class="flex items-center justify-between mb-2 md:mb-3">
+            <h2 class="text-sm md:text-base font-bold text-white/90 flex items-center gap-2">⏰ Daily Deals <span class="text-[9px] md:text-[10px] text-sp-red font-black bg-sp-red/15 px-1.5 md:px-2 py-[2px] rounded-full countdown-blink" id="dailyCountdown">Resets in 12:34:56</span></h2>
+            <span class="text-[10px] text-sp-label cursor-pointer hover:text-white transition">View All →</span>
+          </div>
+          <div id="dailyDealsContainer" class="grid grid-cols-1 md:grid-cols-3 gap-3"></div>
+        </div>
+
+        <!-- Gem Packs -->
+        <div>
+          <h2 class="text-sm md:text-base font-bold mb-2 md:mb-3 text-white/90 flex items-center gap-2">💎 Gem Packs</h2>
+          <div class="relative">
+            <div id="gemPacksScroll" class="hscroll flex gap-2.5 md:gap-3 pb-1"></div>
+            <button onclick="document.getElementById('gemPacksScroll').scrollBy({left:400,behavior:'smooth'})" class="scroll-btn right-0"><span class="text-xs">▶</span></button>
+          </div>
+        </div>
+
+        <!-- Loot Boxes -->
+        <div>
+          <h2 class="text-sm md:text-base font-bold mb-2 md:mb-3 text-white/90 flex items-center gap-2">🎁 Loot Boxes</h2>
+          <div class="relative">
+            <div id="lootBoxScroll" class="hscroll flex gap-2.5 md:gap-3 pb-1"></div>
+            <button onclick="document.getElementById('lootBoxScroll').scrollBy({left:400,behavior:'smooth'})" class="scroll-btn right-0"><span class="text-xs">▶</span></button>
+          </div>
+        </div>
+
+        <!-- Skins & Items Grid -->
+        <div>
+          <div class="flex items-center justify-between mb-2 md:mb-3">
+            <h2 class="text-sm md:text-base font-bold text-white/90 flex items-center gap-2">👗 Skins & Items</h2>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[10px] text-sp-label hidden md:inline">Sort :</span>
+              <select class="bg-sp-panel text-[11px] text-white border border-sp-border/30 rounded-lg px-2 py-1 outline-none cursor-pointer"><option>Popular</option><option>Newest</option><option>Price ↑</option><option>Price ↓</option><option>Rarity</option></select>
+            </div>
+          </div>
+          <div id="skinsGrid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 md:gap-2.5"></div>
+        </div>
+
+        <div class="h-6"></div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open')}
+    function setShopTab(el){document.querySelectorAll('.shop-tab').forEach(t=>{t.classList.remove('active');t.classList.add('bg-sp-panel')});el.classList.add('active');el.classList.remove('bg-sp-panel')}
+
+    /* Daily Deals — FULL-COVER IMAGE CARDS */
+    const dailyDeals=[
+      {name:"Starlight Chest",    originalPrice:500, salePrice:99,  currency:"💎",rarity:"SSR",tag:"90% OFF",img:"./assets/images/shop/lootbox-scene.png"},
+      {name:"Shadow Blade Skin",  originalPrice:1200,salePrice:480, currency:"💎",rarity:"SR", tag:"60% OFF",img:"./assets/images/shop/skin-scene.png"},
+      {name:"Revival Elixir ×10", originalPrice:300, salePrice:150, currency:"💚",rarity:"R",  tag:"50% OFF",img:"./assets/images/shop/gem-scene.png"},
+    ];
+    const dailyCont=document.getElementById('dailyDealsContainer');
+    dailyDeals.forEach(d=>{
+      const rc=d.rarity==='SSR'?'from-amber-400 to-orange-500':d.rarity==='SR'?'from-violet-400 to-purple-500':'from-blue-400 to-cyan-500';
+      dailyCont.innerHTML+=`
+        <div class="img-card">
+          <div class="h-[100px] md:h-[120px] relative overflow-hidden">
+            <img src="${d.img}" alt="${d.name}" class="cover">
+            <div class="overlay"></div>
+            <div class="shimmer absolute inset-0"></div>
+            <span class="absolute top-2 left-2 bg-gradient-to-r ${rc} text-[8px] md:text-[9px] font-black px-1.5 py-[1px] rounded text-white shadow z-10">${d.rarity}</span>
+            <span class="absolute top-2 right-2 bg-sp-red text-[8px] md:text-[9px] font-black px-1.5 py-[1px] rounded text-white z-10">${d.tag}</span>
+          </div>
+          <div class="bg-sp-card p-2 md:p-2.5 rounded-b-xl">
+            <p class="text-[11px] md:text-[12px] font-bold truncate">${d.name}</p>
+            <div class="flex items-center justify-between mt-1 md:mt-1.5">
+              <div class="flex items-center gap-1"><span class="text-[10px] md:text-[11px]">${d.currency}</span><span class="text-[12px] md:text-[13px] font-black text-sp-gold">${d.salePrice}</span><span class="text-[9px] md:text-[10px] text-sp-label line-through">${d.originalPrice}</span></div>
+              <button class="buy-btn bg-sp-green hover:bg-green-500 text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-[3px] rounded-full shadow">BUY</button>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    /* Gem Packs — FULL-COVER IMAGE CARDS */
+    const gemPacks=[
+      {name:"Tiny Pouch",    gems:60,   bonus:0,   price:"$0.99",  popular:false},
+      {name:"Small Sack",    gems:330,  bonus:30,  price:"$4.99",  popular:false},
+      {name:"Medium Bag",    gems:730,  bonus:70,  price:"$9.99",  popular:true},
+      {name:"Big Chest",     gems:1600, bonus:200, price:"$19.99", popular:false},
+      {name:"Royal Vault",   gems:3600, bonus:600, price:"$39.99", popular:false},
+      {name:"Star Treasury", gems:8000, bonus:2000,price:"$79.99", popular:false},
+    ];
+    const gemCont=document.getElementById('gemPacksScroll');
+    gemPacks.forEach(g=>{
+      const pop=g.popular?`<span class="absolute -top-0.5 left-1/2 -translate-x-1/2 bg-sp-red text-[7px] md:text-[8px] font-black px-1.5 md:px-2 py-[1px] rounded-b text-white z-10">BEST VALUE</span>`:'';
+      const brd=g.popular?'border-sp-gold':'border-transparent';
+      gemCont.innerHTML+=`
+        <div class="img-card flex-shrink-0 w-[130px] md:w-[160px] border-2 ${brd}" style="scroll-snap-align:start">
+          ${pop}
+          <div class="h-[80px] md:h-[100px] relative overflow-hidden">
+            <img src="./assets/images/shop/gem-scene.png" alt="${g.name}" class="cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-sp-bg/95 via-sp-bg/40 to-transparent"></div>
+            <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+              <span class="text-lg md:text-xl">💎</span>
+              <span class="text-base md:text-lg font-black drop-shadow-lg">${g.gems.toLocaleString()}</span>
+            </div>
+          </div>
+          <div class="bg-sp-card p-1.5 md:p-2 text-center rounded-b-xl">
+            <p class="text-[10px] md:text-[11px] font-bold truncate">${g.name}</p>
+            ${g.bonus>0?`<p class="text-[8px] md:text-[9px] text-sp-green font-bold">+${g.bonus} Bonus</p>`:'<p class="text-[8px] md:text-[9px] text-sp-label">—</p>'}
+            <button class="buy-btn mt-1 w-full py-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg text-[10px] md:text-[11px] font-black shadow-lg">${g.price}</button>
+          </div>
+        </div>`;
+    });
+
+    /* Loot Boxes — FULL-COVER IMAGE CARDS */
+    const lootBoxes=[
+      {name:"Bronze Chest",  rarity:"R",  guaranteed:"1 R+ Item",     price:100, currency:"💎"},
+      {name:"Silver Chest",  rarity:"SR", guaranteed:"1 SR+ Item",    price:300, currency:"💎"},
+      {name:"Gold Chest",    rarity:"SSR",guaranteed:"1 SSR Shard",   price:500, currency:"💎"},
+      {name:"Cosmic Chest",  rarity:"SSR",guaranteed:"1 SSR Character",price:1000,currency:"💎"},
+      {name:"Lucky Box",     rarity:"?",  guaranteed:"Random ×5",     price:250, currency:"💚"},
+      {name:"Star Premium",  rarity:"SSR",guaranteed:"SSR Guaranteed",price:2000,currency:"💎"},
+    ];
+    const lootCont=document.getElementById('lootBoxScroll');
+    lootBoxes.forEach(l=>{
+      const rc=l.rarity==='SSR'?'text-sp-gold':l.rarity==='SR'?'text-violet-400':l.rarity==='?'?'text-sp-green':'text-blue-400';
+      lootCont.innerHTML+=`
+        <div class="img-card flex-shrink-0 w-[140px] md:w-[170px]" style="scroll-snap-align:start">
+          <div class="h-[100px] md:h-[120px] relative overflow-hidden">
+            <img src="./assets/images/shop/lootbox-scene.png" alt="${l.name}" class="cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-sp-bg/90 via-sp-bg/30 to-transparent"></div>
+            <span class="absolute top-2 left-2 ${rc} text-[9px] md:text-[10px] font-black bg-black/40 backdrop-blur-sm px-1.5 py-[1px] rounded z-10">${l.rarity}</span>
+          </div>
+          <div class="bg-sp-card p-2 md:p-2.5 rounded-b-xl">
+            <p class="text-[11px] md:text-[12px] font-bold truncate">${l.name}</p>
+            <p class="text-[8px] md:text-[9px] text-sp-label mt-0.5">${l.guaranteed}</p>
+            <div class="flex items-center justify-between mt-1 md:mt-1.5">
+              <div class="flex items-center gap-0.5"><span class="text-[10px] md:text-[11px]">${l.currency}</span><span class="text-[11px] md:text-[12px] font-black">${l.price.toLocaleString()}</span></div>
+              <button class="buy-btn bg-gradient-to-r from-violet-500 to-purple-600 text-[9px] md:text-[10px] font-black px-1.5 md:px-2 py-[3px] rounded-full shadow">OPEN</button>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    /* Skins & Items — FULL-COVER IMAGE CARDS */
+    const skinsItems=[
+      {name:"Cosmic Voyager",   type:"Skin",rarity:"SSR",price:1200,currency:"💎",img:"./assets/images/events/cosmic-race.png",owned:false},
+      {name:"Shadow Wraith",    type:"Skin",rarity:"SSR",price:1200,currency:"💎",img:"./assets/images/events/frost.png",owned:false},
+      {name:"Cherry Blossom",   type:"Skin",rarity:"SR", price:800, currency:"💎",img:"./assets/images/events/spring-fest.png",owned:false},
+      {name:"Frost Knight",     type:"Skin",rarity:"SR", price:800, currency:"💎",img:"./assets/images/events/frost.png",owned:false},
+      {name:"Dragon Flame",     type:"Skin",rarity:"SSR",price:1500,currency:"💎",img:"./assets/images/events/arena-blitz.png",owned:false},
+      {name:"Mystic Oracle",    type:"Skin",rarity:"SR", price:600, currency:"💚",img:"./assets/images/events/star-crown.png",owned:true},
+      {name:"HP Potion ×20",    type:"Item",rarity:"R",  price:50,  currency:"💚",img:"./assets/images/shop/gem-scene.png",owned:false},
+      {name:"MP Potion ×20",    type:"Item",rarity:"R",  price:50,  currency:"💚",img:"./assets/images/shop/gem-scene.png",owned:false},
+      {name:"EXP Booster ×1h",  type:"Item",rarity:"SR", price:200, currency:"💎",img:"./assets/images/events/lucky-draw.png",owned:false},
+      {name:"Gold Booster ×1h", type:"Item",rarity:"SR", price:200, currency:"💎",img:"./assets/images/events/lucky-draw.png",owned:false},
+      {name:"Star Fragment ×5", type:"Item",rarity:"SSR",price:500, currency:"💎",img:"./assets/images/events/star-crown.png",owned:false},
+      {name:"Rainbow Dye",      type:"Item",rarity:"R",  price:80,  currency:"💚",img:"./assets/images/events/cosmic-race.png",owned:false},
+    ];
+    const skinsCont=document.getElementById('skinsGrid');
+    skinsItems.forEach(s=>{
+      const rc=s.rarity==='SSR'?'from-amber-400 to-orange-500':s.rarity==='SR'?'from-violet-400 to-purple-500':'from-blue-400 to-cyan-500';
+      const ownedBadge=s.owned?`<div class="absolute inset-0 bg-black/50 flex items-center justify-center z-20"><span class="text-[9px] md:text-[10px] font-black bg-sp-green/90 px-2 py-0.5 rounded-full">OWNED</span></div>`:'';
+      const btn=s.owned?'bg-sp-accent/50 cursor-default':'bg-sp-green buy-btn';
+      const btxt=s.owned?'EQUIPPED':'BUY';
+      skinsCont.innerHTML+=`
+        <div class="img-card">
+          <div class="h-[80px] md:h-[100px] relative overflow-hidden rounded-t-xl">
+            <img src="${s.img}" alt="${s.name}" class="cover">
+            <div class="absolute inset-0 bg-gradient-to-t from-sp-bg/85 via-sp-bg/20 to-transparent"></div>
+            ${ownedBadge}
+            <span class="absolute top-1.5 left-1.5 bg-gradient-to-r ${rc} text-[7px] md:text-[8px] font-black px-1.5 py-[1px] rounded text-white z-10">${s.rarity}</span>
+            <span class="absolute top-1.5 right-1.5 bg-black/40 backdrop-blur-sm text-[7px] md:text-[8px] font-semibold px-1.5 py-[1px] rounded text-white/70 z-10">${s.type}</span>
+          </div>
+          <div class="bg-sp-card p-1.5 md:p-2 rounded-b-xl">
+            <p class="text-[10px] md:text-[11px] font-bold truncate">${s.name}</p>
+            <div class="flex items-center justify-between mt-1">
+              <div class="flex items-center gap-0.5"><span class="text-[9px] md:text-[10px]">${s.currency}</span><span class="text-[10px] md:text-[11px] font-black">${s.price.toLocaleString()}</span></div>
+              <button class="${btn} text-[8px] md:text-[9px] font-black px-1.5 py-[2px] rounded-full">${btxt}</button>
+            </div>
+          </div>
+        </div>`;
+    });
+
+    /* Countdown */
+    function updateCountdown(){const n=new Date(),e=new Date(n);e.setHours(23,59,59,999);const d=e-n,h=String(Math.floor(d/36e5)).padStart(2,'0'),m=String(Math.floor(d%36e5/6e4)).padStart(2,'0'),s=String(Math.floor(d%6e4/1e3)).padStart(2,'0'),t=`${h}:${m}:${s}`;const bc=document.getElementById('bannerCountdown'),dc=document.getElementById('dailyCountdown');if(bc)bc.textContent=t;if(dc)dc.textContent=`Resets in ${t}`}
+    setInterval(updateCountdown,1000);updateCountdown();
+  </script>
+</body>
+</html>
