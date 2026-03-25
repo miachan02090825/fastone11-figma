@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Star Party — Block Blast</title>
+  <meta name="description" content="Block Blast — A grid-based cube game with the addictive fun of classic block puzzles. Exercise your brain and sharpen your skills!">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config={theme:{extend:{colors:{'sp':{'bg':'#0f1225','sidebar':'#161a35','panel':'#1e2348','card':'#272d5a','hover':'#313772','accent':'#4858a8','border':'#2a3060','gold':'#f5a623','green':'#2ed573','red':'#ff4757','purple':'#7c3aed','muted':'#6b7db3','label':'#8892b0'}},fontFamily:{'body':['Nunito','sans-serif']}}}}
+  </script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    html{font-size:14px}
+    body{font-family:'Nunito',sans-serif;background:#0f1225;color:#fff;overflow-x:hidden;max-width:100vw}
+    ::-webkit-scrollbar{width:5px;height:5px}
+    ::-webkit-scrollbar-track{background:transparent}
+    ::-webkit-scrollbar-thumb{background:#4858a8;border-radius:10px}
+
+    .sidebar-link{transition:all .15s ease;border-radius:8px}
+    .sidebar-link:hover{background:rgba(72,88,168,.2)}
+    .sidebar-link.active{color:#7c9fff;font-weight:700}
+    .nav-icon{width:16px;height:16px;object-fit:contain;border-radius:3px;flex-shrink:0}
+
+    .img-card{position:relative;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
+    .img-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 30px rgba(0,0,0,.4)}
+    .img-card img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
+    .img-card:hover img.cover{transform:scale(1.08)}
+    .img-card .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,18,37,.85) 0%,rgba(15,18,37,.3) 50%,transparent 100%)}
+    .img-card .label{position:absolute;z-index:2}
+
+    .hscroll{overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
+    .hscroll::-webkit-scrollbar{height:3px}
+    .scroll-btn{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(15,18,37,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:background .2s}
+    .scroll-btn:hover{background:rgba(72,88,168,.6)}
+
+    @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .marquee-inner{animation:marquee 20s linear infinite}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    .float-anim{animation:float 3s ease-in-out infinite}
+
+    @keyframes pulse-glow{0%,100%{box-shadow:0 0 20px rgba(59,130,246,.3)}50%{box-shadow:0 0 35px rgba(59,130,246,.6)}}
+    .pulse-glow{animation:pulse-glow 2s ease-in-out infinite}
+
+    @keyframes score-pop{0%{transform:scale(1)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+    .score-pop:hover{animation:score-pop .4s ease}
+
+    .section-title{display:flex;align-items:center;gap:8px;margin-bottom:12px;font-weight:800;font-size:15px}
+    .section-title::before{content:'';display:block;width:4px;height:20px;border-radius:4px;background:linear-gradient(to bottom,#3b82f6,#7c3aed)}
+
+    .tab-btn{padding:6px 16px;border-radius:9999px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s ease;border:1px solid transparent;background:rgba(72,88,168,.15);color:#8892b0}
+    .tab-btn.active{background:linear-gradient(135deg,#3b82f6,#7c3aed);color:#fff;border-color:rgba(255,255,255,.1);box-shadow:0 4px 15px rgba(59,130,246,.3)}
+    .tab-btn:hover:not(.active){background:rgba(72,88,168,.3);color:#fff}
+
+    .collection-card{width:64px;height:64px;border-radius:12px;overflow:hidden;flex-shrink:0;position:relative;cursor:pointer;transition:all .2s ease;border:2px solid transparent;scroll-snap-align:start}
+    .collection-card:hover{transform:scale(1.1);border-color:#7c3aed;box-shadow:0 4px 15px rgba(124,58,237,.3)}
+    .collection-card img{width:100%;height:100%;object-fit:cover}
+
+    .reward-icon{width:48px;height:48px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;scroll-snap-align:start;position:relative}
+    .reward-icon:hover{transform:scale(1.15);box-shadow:0 4px 12px rgba(0,0,0,.4)}
+
+    .podium-avatar{border-radius:50%;border:3px solid;overflow:hidden;position:relative}
+
+    .rank-row{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:12px;transition:background .2s}
+    .rank-row:hover{background:rgba(72,88,168,.15)}
+
+    .progress-ring{transform:rotate(-90deg)}
+    .progress-ring circle{transition:stroke-dashoffset .6s ease}
+
+    .hamburger-btn{display:none}
+    .sidebar-overlay{display:none}
+    @media(max-width:1023px){
+      .hamburger-btn{display:flex}
+      #sidebar{transform:translateX(-100%);transition:transform .3s ease}
+      #sidebar.open{transform:translateX(0)}
+      .sidebar-overlay.open{display:block;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5)}
+      main{margin-left:0!important}
+    }
+
+    .back-to-top{position:fixed;bottom:24px;right:24px;z-index:30;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#7c3aed);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(59,130,246,.4);transition:all .3s;opacity:0;pointer-events:none}
+    .back-to-top.visible{opacity:1;pointer-events:auto}
+    .back-to-top:hover{transform:translateY(-3px);box-shadow:0 6px 25px rgba(59,130,246,.5)}
+  </style>
+</head>
+<body class="font-body">
+
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+  <div class="flex min-h-screen">
+
+    <!-- ========== SIDEBAR ========== -->
+    <aside id="sidebar" class="w-[140px] bg-sp-sidebar fixed top-0 left-0 bottom-0 z-50 flex flex-col border-r border-sp-border/40 overflow-hidden">
+      <div class="flex items-center gap-2 px-3 pt-3 pb-2">
+        <div class="w-7 h-7 rounded-md bg-sp-panel border border-sp-border flex items-center justify-center text-xs font-black text-white/70">K</div>
+        <div class="leading-none">
+          <div class="text-[10px] font-black tracking-widest bg-gradient-to-r from-amber-400 via-rose-400 to-cyan-400 bg-clip-text text-transparent">STAR</div>
+          <div class="text-[10px] font-black tracking-widest bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent">PARTY</div>
+        </div>
+      </div>
+      <nav class="flex-1 overflow-y-auto px-1.5 py-1 text-[13px] space-y-[2px]">
+        <a href="index.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/home.png" alt="" class="nav-icon opacity-70"><span>Home</span></a>
+        <a href="#" class="sidebar-link active flex items-center gap-2 px-2.5 py-[6px]"><img src="./assets/images/icons/games.png" alt="" class="nav-icon"><span>Games</span></a>
+        <a href="character.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/character.png" alt="" class="nav-icon opacity-70"><span>Character</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/gacha.png" alt="" class="nav-icon opacity-70"><span>Gacha</span></a>
+        <a href="shop.html" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/shop.png" alt="" class="nav-icon opacity-70"><span>Shop</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/rank.png" alt="" class="nav-icon opacity-70"><span>Rank</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/starcards.png" alt="" class="nav-icon opacity-70"><span>StarCards</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/playground.png" alt="" class="nav-icon opacity-70"><span>PlayGround</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/event.png" alt="" class="nav-icon opacity-70"><span>EventCenter</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/reward.png" alt="" class="nav-icon opacity-70"><span>RewardCenter</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/achievement.png" alt="" class="nav-icon opacity-70"><span>Achievement</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/inventory.png" alt="" class="nav-icon opacity-70"><span>Inventory</span></a>
+        <div class="border-t border-white/5 my-2"></div>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/action.png" alt="" class="nav-icon opacity-70"><span>Action</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/match.png" alt="" class="nav-icon opacity-70"><span>Match</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/puzzle.png" alt="" class="nav-icon opacity-70"><span>Puzzle</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-2 px-2.5 py-[6px] text-sp-label"><img src="./assets/images/icons/multiplayer.png" alt="" class="nav-icon opacity-70"><span>Multiplayer</span></a>
+      </nav>
+      <div class="px-1.5 pb-2 space-y-1.5">
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden">⭐ ALL-STARS</div>
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden" style="animation-delay:.4s">⭐ ALL-STARS</div>
+        <div class="float-anim rounded-lg h-[44px] bg-gradient-to-r from-pink-600 to-red-500 flex items-center justify-center cursor-pointer text-[11px] font-bold overflow-hidden" style="animation-delay:.8s">⭐ ALL-STARS</div>
+      </div>
+    </aside>
+
+    <!-- ========== MAIN ========== -->
+    <main class="flex-1 ml-0 lg:ml-[140px] min-h-screen flex flex-col overflow-x-hidden">
+
+      <!-- Top Bar -->
+      <header class="sticky top-0 z-40 bg-sp-bg/85 backdrop-blur-xl border-b border-sp-border/30">
+        <div class="flex items-center px-3 md:px-4 py-2 gap-2 md:gap-3">
+          <button class="hamburger-btn w-8 h-8 rounded-lg bg-sp-panel items-center justify-center" onclick="toggleSidebar()"><span class="text-white text-sm">☰</span></button>
+          <div class="flex-1 flex items-center bg-indigo-800/40 rounded-full px-2 md:px-3 py-1.5 mr-1 md:mr-3 overflow-hidden">
+            <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-700 flex items-center justify-center flex-shrink-0 mr-1.5 md:mr-2 overflow-hidden">
+              <img src="./assets/images/icons/event.png" alt="" class="w-3 h-3 object-contain">
+            </div>
+            <div class="overflow-hidden flex-1 whitespace-nowrap">
+              <span class="marquee-inner inline-block text-[11px] md:text-[13px]">System Announcement: 123 Test~~~Test 123!!! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System Announcement: 123 Test~~~Test 123!!!</span>
+            </div>
+          </div>
+          <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/multiplayer.png" alt="Chat" class="w-3.5 h-3.5 object-contain"></button>
+          <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/reward.png" alt="Mail" class="w-3.5 h-3.5 object-contain"></button>
+          <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/gacha.png" alt="Settings" class="w-3.5 h-3.5 object-contain"></button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="flex-1 p-3 md:p-4 lg:p-6 space-y-5 md:space-y-7 lg:space-y-10">
+
+        <!-- ===== BREADCRUMBS ===== -->
+        <nav class="flex items-center gap-1.5 text-[11px] md:text-[12px] text-sp-label flex-wrap">
+          <a href="index.html" class="hover:text-white transition">Home</a>
+          <span class="text-white/30">›</span>
+          <a href="#" class="hover:text-white transition">Games</a>
+          <span class="text-white/30">›</span>
+          <a href="#" class="hover:text-white transition">Game Category</a>
+          <span class="text-white/30">›</span>
+          <span class="text-white font-semibold">Block Blast</span>
+        </nav>
+
+        <!-- ===== GAME HERO + RIGHT SIDEBAR ===== -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-6">
+
+          <!-- Hero Area -->
+          <div class="lg:col-span-8 xl:col-span-9">
+            <!-- Game Title Bar -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-5">
+              <div class="w-[72px] h-[72px] md:w-[88px] md:h-[88px] rounded-2xl overflow-hidden flex-shrink-0 border-2 border-sp-accent/40 shadow-lg shadow-blue-500/10">
+                <img src="./assets/images/block-blast-hero.png" alt="Block Blast" class="w-full h-full object-cover">
+              </div>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-2 mb-1">
+                  <h1 class="text-2xl md:text-3xl font-black tracking-tight">Block Blast</h1>
+                  <span class="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] md:text-[11px] font-bold border border-purple-500/30">Puzzle</span>
+                </div>
+                <div class="flex items-center gap-3 text-sp-label text-[11px] md:text-[12px]">
+                  <span class="flex items-center gap-1"><span class="text-sp-gold">🔥</span> 3.5K+</span>
+                  <span class="flex items-center gap-1">⭐ 4.8</span>
+                  <span class="flex items-center gap-1">🎮 Casual</span>
+                </div>
+              </div>
+              <button id="playNowBtn" class="pulse-glow flex items-center gap-2 px-6 md:px-8 py-3 md:py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-400 hover:to-blue-500 rounded-xl text-sm md:text-base font-black tracking-wide shadow-lg shadow-blue-500/30 transition-all flex-shrink-0">
+                <span class="text-lg">▶</span> PLAY NOW
+              </button>
+            </div>
+
+            <!-- ===== GAME INFORMATION ===== -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-sp-border/30 mb-5">
+              <h2 class="section-title">Game Information</h2>
+              <p class="text-sp-label text-[12px] md:text-[13px] leading-relaxed">
+                Block Master is a puzzle game that blends the nostalgia of a grid-based cube game with the addictive fun of classic block puzzles. Exercise your brain as you navigate through increasingly intricate levels, with endless opportunities to sharpen your skills and elevate your IQ score. Give it a try and master the art of puzzle bliss and hit the block leaderboard rankings!
+              </p>
+            </div>
+
+            <!-- ===== COLLECTIONS ===== -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-sp-border/30 mb-5">
+              <div class="flex items-center justify-between mb-4">
+                <h2 class="section-title mb-0">Collections</h2>
+                <a href="#" class="text-[11px] text-blue-400 hover:text-blue-300 transition font-semibold">View More ›</a>
+              </div>
+
+              <!-- Theme -->
+              <div class="mb-4">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 text-[10px] font-bold">Theme</span>
+                </div>
+                <div class="relative">
+                  <div id="themeScroll" class="hscroll flex gap-2.5 pb-1"></div>
+                  <button onclick="document.getElementById('themeScroll').scrollBy({left:200,behavior:'smooth'})" class="scroll-btn right-0 w-7 h-7"><span class="text-[10px]">▶</span></button>
+                </div>
+              </div>
+
+              <!-- Ultimate Skill -->
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2.5 py-1 rounded-lg bg-purple-500/15 text-purple-300 text-[10px] font-bold">Ultimate Skill</span>
+                </div>
+                <div class="relative">
+                  <div id="skillScroll" class="hscroll flex gap-2.5 pb-1"></div>
+                  <button onclick="document.getElementById('skillScroll').scrollBy({left:200,behavior:'smooth'})" class="scroll-btn right-0 w-7 h-7"><span class="text-[10px]">▶</span></button>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== PERSONAL PERFORMANCE ===== -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-sp-border/30 mb-5">
+              <h2 class="section-title">Personal Performance</h2>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
+                <!-- Best Score -->
+                <div class="score-pop bg-gradient-to-br from-amber-500/10 to-amber-600/5 rounded-xl p-4 border border-amber-500/15 cursor-pointer">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                      <span class="text-lg font-black text-white drop-shadow">S</span>
+                    </div>
+                    <span class="text-[11px] text-sp-label font-semibold">Best Score</span>
+                  </div>
+                  <p class="text-2xl md:text-3xl font-black text-sp-gold tracking-tight">2,800</p>
+                </div>
+                <!-- Daily Best -->
+                <div class="score-pop bg-gradient-to-br from-red-500/10 to-orange-500/5 rounded-xl p-4 border border-red-500/15 cursor-pointer">
+                  <div class="flex items-center gap-2 mb-2">
+                    <div class="w-10 h-10 rounded-full bg-gradient-to-br from-red-400 to-orange-500 flex items-center justify-center shadow-lg shadow-red-500/20">
+                      <span class="text-lg">🔥</span>
+                    </div>
+                    <span class="text-[11px] text-sp-label font-semibold">Daily Best</span>
+                  </div>
+                  <p class="text-2xl md:text-3xl font-black text-red-400 tracking-tight">1,750</p>
+                </div>
+                <!-- Growth -->
+                <div class="score-pop bg-gradient-to-br from-blue-500/10 to-purple-500/5 rounded-xl p-4 border border-blue-500/15 cursor-pointer flex flex-col items-center justify-center">
+                  <span class="text-[11px] text-sp-label font-semibold mb-2">Growth</span>
+                  <div class="relative w-[80px] h-[80px]">
+                    <svg class="progress-ring w-full h-full" viewBox="0 0 80 80">
+                      <circle cx="40" cy="40" r="35" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="6"/>
+                      <circle cx="40" cy="40" r="35" fill="none" stroke="url(#grad)" stroke-width="6" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="132"/>
+                      <defs><linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#3b82f6"/><stop offset="100%" style="stop-color:#7c3aed"/></linearGradient></defs>
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                      <span class="text-[10px]">👑</span>
+                      <span class="text-lg font-black bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent leading-tight">28</span>
+                    </div>
+                  </div>
+                  <span class="text-[10px] text-sp-label mt-1">20 / 50 ⭐</span>
+                </div>
+                <!-- Next Reward -->
+                <div class="score-pop bg-gradient-to-br from-emerald-500/10 to-cyan-500/5 rounded-xl p-4 border border-emerald-500/15 cursor-pointer">
+                  <span class="text-[11px] text-sp-label font-semibold block mb-2">Next Reward</span>
+                  <div class="flex items-center gap-3">
+                    <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/20 flex items-center justify-center border border-emerald-500/20">
+                      <span class="text-2xl">💎</span>
+                    </div>
+                    <div>
+                      <p class="font-black text-lg text-emerald-400">54</p>
+                      <p class="text-[10px] text-sp-label">Krystal</p>
+                      <p class="text-[9px] text-sp-muted mt-0.5">Lv. 29</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===== REWARD LISTS ===== -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-sp-border/30 mb-5">
+              <h2 class="section-title">Reward Lists</h2>
+              <div class="relative">
+                <div id="rewardScroll" class="hscroll flex gap-3 md:gap-4 pb-1"></div>
+              </div>
+            </div>
+
+            <!-- ===== DAILY EVENTS ===== -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-sp-border/30 mb-5">
+              <h2 class="section-title">Daily Events</h2>
+              <div class="relative">
+                <div id="dailyEventsScroll" class="hscroll flex gap-3 pb-1"></div>
+                <button onclick="document.getElementById('dailyEventsScroll').scrollBy({left:400,behavior:'smooth'})" class="scroll-btn right-0"><span class="text-xs">▶</span></button>
+              </div>
+            </div>
+
+            <!-- ===== RANKING ===== -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-sp-border/30">
+              <h2 class="section-title">Ranking</h2>
+
+              <!-- Tabs -->
+              <div class="flex flex-wrap gap-2 mb-4">
+                <button class="tab-btn active" onclick="switchRankTab(this)">Highest Score</button>
+                <button class="tab-btn" onclick="switchRankTab(this)">Daily Best</button>
+              </div>
+
+              <!-- Filters -->
+              <div class="flex flex-wrap gap-2 mb-6">
+                <button class="tab-btn active text-[10px] py-1 px-3" onclick="switchFilter(this)">Global</button>
+                <button class="tab-btn text-[10px] py-1 px-3" onclick="switchFilter(this)">Friends</button>
+                <button class="tab-btn text-[10px] py-1 px-3" onclick="switchFilter(this)">Month</button>
+              </div>
+
+              <!-- Podium -->
+              <div class="flex items-end justify-center gap-4 md:gap-8 mb-8 py-4">
+                <!-- 2nd Place -->
+                <div class="flex flex-col items-center">
+                  <div class="podium-avatar w-14 h-14 md:w-16 md:h-16 border-gray-300 mb-2">
+                    <img src="./assets/images/hero-character.png" alt="2nd" class="w-full h-full object-cover">
+                  </div>
+                  <span class="text-[11px] font-bold text-gray-300">Player_B</span>
+                  <span class="text-[10px] text-sp-label">2,750</span>
+                  <div class="w-16 md:w-20 h-[50px] bg-gradient-to-t from-gray-500/20 to-gray-400/10 rounded-t-lg mt-2 flex items-center justify-center border border-gray-500/20">
+                    <span class="text-lg font-black text-gray-300">2</span>
+                  </div>
+                </div>
+                <!-- 1st Place -->
+                <div class="flex flex-col items-center -mt-6">
+                  <span class="text-xl mb-1">👑</span>
+                  <div class="podium-avatar w-16 h-16 md:w-20 md:h-20 border-sp-gold mb-2 shadow-lg shadow-amber-500/20">
+                    <img src="./assets/images/hero-character.png" alt="1st" class="w-full h-full object-cover">
+                  </div>
+                  <span class="text-[12px] font-black text-sp-gold">Player_A</span>
+                  <span class="text-[11px] text-sp-gold font-bold">2,840</span>
+                  <div class="w-20 md:w-24 h-[70px] bg-gradient-to-t from-amber-500/20 to-amber-400/10 rounded-t-lg mt-2 flex items-center justify-center border border-amber-500/30">
+                    <span class="text-2xl font-black text-sp-gold">1</span>
+                  </div>
+                </div>
+                <!-- 3rd Place -->
+                <div class="flex flex-col items-center">
+                  <div class="podium-avatar w-12 h-12 md:w-14 md:h-14 border-amber-700 mb-2">
+                    <img src="./assets/images/hero-character.png" alt="3rd" class="w-full h-full object-cover">
+                  </div>
+                  <span class="text-[11px] font-bold text-amber-700">Player_C</span>
+                  <span class="text-[10px] text-sp-label">2,100</span>
+                  <div class="w-14 md:w-18 h-[35px] bg-gradient-to-t from-amber-700/20 to-amber-600/10 rounded-t-lg mt-2 flex items-center justify-center border border-amber-700/20">
+                    <span class="text-base font-black text-amber-700">3</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Rank List -->
+              <div id="rankList" class="space-y-1.5"></div>
+
+              <!-- Back to TOP -->
+              <div class="flex justify-center mt-6">
+                <button onclick="window.scrollTo({top:0,behavior:'smooth'})" class="flex items-center gap-2 px-5 py-2 rounded-full bg-sp-card hover:bg-sp-hover transition text-[11px] text-sp-label hover:text-white font-semibold border border-sp-border/30">
+                  <span>⬆</span> Back to TOP
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Sidebar: Related Games -->
+          <div class="lg:col-span-4 xl:col-span-3 space-y-4">
+            <!-- Currency Bar -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-3 border border-sp-border/30 flex items-center justify-around">
+              <div class="flex items-center gap-1.5 text-[11px]"><span>🪙</span><span class="font-bold text-sp-gold">6,800k</span></div>
+              <div class="w-px h-4 bg-sp-border/40"></div>
+              <div class="flex items-center gap-1.5 text-[11px]"><span>⭐</span><span class="font-bold text-amber-300">1,200</span></div>
+              <div class="w-px h-4 bg-sp-border/40"></div>
+              <div class="flex items-center gap-1.5 text-[11px]"><span>💎</span><span class="font-bold text-purple-300">340</span></div>
+            </div>
+
+            <!-- Related Games -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 border border-sp-border/30">
+              <h3 class="text-[13px] font-bold mb-3 text-white/80">Related Games</h3>
+              <div id="relatedGames" class="space-y-2.5"></div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="bg-sp-panel/60 backdrop-blur-sm rounded-2xl p-4 border border-sp-border/30">
+              <h3 class="text-[13px] font-bold mb-3 text-white/80">Quick Stats</h3>
+              <div class="space-y-3">
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-sp-label">Total Plays</span>
+                  <span class="font-bold">1,847</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-sp-card overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500 w-[72%]"></div></div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-sp-label">Win Rate</span>
+                  <span class="font-bold text-sp-green">68%</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-sp-card overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-emerald-500 to-green-400 w-[68%]"></div></div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-sp-label">Avg. Score</span>
+                  <span class="font-bold text-sp-gold">1,520</span>
+                </div>
+                <div class="w-full h-1.5 rounded-full bg-sp-card overflow-hidden"><div class="h-full rounded-full bg-gradient-to-r from-amber-500 to-orange-400 w-[55%]"></div></div>
+                <div class="flex items-center justify-between text-[12px]">
+                  <span class="text-sp-label">Time Played</span>
+                  <span class="font-bold">42h 15m</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Back to Top Button -->
+  <div id="backToTop" class="back-to-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+    <span class="text-lg">⬆</span>
+  </div>
+
+  <script>
+    function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open')}
+
+    function switchRankTab(btn){btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+    function switchFilter(btn){btn.parentElement.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')}
+
+    /* Back to top visibility */
+    window.addEventListener('scroll',()=>{
+      document.getElementById('backToTop').classList.toggle('visible',window.scrollY>400);
+    });
+
+    /* ── Theme Collection Cards ── */
+    const themeChars=[
+      {name:"Momo",  hue:"from-pink-400 to-rose-500"},
+      {name:"Kiki",  hue:"from-cyan-400 to-blue-500"},
+      {name:"Lala",  hue:"from-amber-400 to-orange-500"},
+      {name:"Nana",  hue:"from-emerald-400 to-green-500"},
+      {name:"Dodo",  hue:"from-violet-400 to-purple-500"},
+      {name:"Bibi",  hue:"from-red-400 to-pink-500"},
+      {name:"Zuzu",  hue:"from-teal-400 to-cyan-500"},
+      {name:"Pipi",  hue:"from-yellow-400 to-amber-500"},
+      {name:"Gogo",  hue:"from-indigo-400 to-blue-600"},
+      {name:"Riri",  hue:"from-rose-400 to-red-500"},
+      {name:"Toto",  hue:"from-lime-400 to-green-500"},
+      {name:"Fifi",  hue:"from-fuchsia-400 to-purple-500"},
+    ];
+    const themeCont=document.getElementById('themeScroll');
+    themeChars.forEach(c=>{
+      themeCont.innerHTML+=`
+        <div class="collection-card bg-gradient-to-br ${c.hue}" title="${c.name}">
+          <img src="./assets/images/collection-char.png" alt="${c.name}" class="opacity-80">
+          <div class="absolute bottom-0 inset-x-0 bg-black/40 backdrop-blur-sm text-center py-0.5"><span class="text-[8px] font-bold">${c.name}</span></div>
+        </div>`;
+    });
+
+    /* ── Ultimate Skill Cards ── */
+    const skills=[
+      {name:"Fireball",  emoji:"🔥", bg:"from-red-500/30 to-orange-500/20"},
+      {name:"Shield",    emoji:"🛡️", bg:"from-blue-500/30 to-cyan-500/20"},
+      {name:"Lightning", emoji:"⚡", bg:"from-yellow-500/30 to-amber-500/20"},
+      {name:"Freeze",    emoji:"❄️", bg:"from-cyan-500/30 to-blue-400/20"},
+      {name:"Heal",      emoji:"💚", bg:"from-green-500/30 to-emerald-500/20"},
+      {name:"Bomb",      emoji:"💣", bg:"from-gray-500/30 to-red-500/20"},
+      {name:"Star",      emoji:"⭐", bg:"from-amber-500/30 to-yellow-500/20"},
+      {name:"Tornado",   emoji:"🌪️", bg:"from-teal-500/30 to-cyan-500/20"},
+      {name:"Poison",    emoji:"☠️", bg:"from-purple-500/30 to-violet-500/20"},
+      {name:"Boost",     emoji:"🚀", bg:"from-indigo-500/30 to-blue-500/20"},
+    ];
+    const skillCont=document.getElementById('skillScroll');
+    skills.forEach(s=>{
+      skillCont.innerHTML+=`
+        <div class="collection-card bg-gradient-to-br ${s.bg} border border-white/5 flex items-center justify-center" title="${s.name}">
+          <span class="text-2xl">${s.emoji}</span>
+          <div class="absolute bottom-0 inset-x-0 bg-black/30 backdrop-blur-sm text-center py-0.5"><span class="text-[7px] font-semibold">${s.name}</span></div>
+        </div>`;
+    });
+
+    /* ── Reward List Items ── */
+    const rewards=[
+      {name:"Green Gem",   emoji:"💚", amount:"50",   bg:"from-emerald-500 to-green-600"},
+      {name:"Star Coin",   emoji:"⭐", amount:"150",  bg:"from-amber-500 to-yellow-600"},
+      {name:"Gold Coin",   emoji:"🪙", amount:"6,800k",bg:"from-yellow-500 to-amber-600"},
+      {name:"Diamond",     emoji:"💎", amount:"25",   bg:"from-cyan-400 to-blue-500"},
+      {name:"Ruby",        emoji:"❤️", amount:"10",   bg:"from-red-500 to-rose-600"},
+      {name:"Crystal",     emoji:"🔮", amount:"80",   bg:"from-purple-500 to-violet-600"},
+      {name:"Pearl",       emoji:"⚪", amount:"35",   bg:"from-gray-300 to-gray-500"},
+      {name:"Fire Stone",  emoji:"🔥", amount:"12",   bg:"from-orange-500 to-red-500"},
+      {name:"Ice Shard",   emoji:"❄️", amount:"45",   bg:"from-cyan-300 to-blue-400"},
+      {name:"Thunder Orb", emoji:"⚡", amount:"18",   bg:"from-yellow-400 to-amber-500"},
+      {name:"Nature Leaf",  emoji:"🍃", amount:"60",  bg:"from-green-400 to-emerald-500"},
+      {name:"Moon Stone",  emoji:"🌙", amount:"8",    bg:"from-indigo-400 to-purple-500"},
+    ];
+    const rewardCont=document.getElementById('rewardScroll');
+    rewards.forEach(r=>{
+      rewardCont.innerHTML+=`
+        <div class="flex flex-col items-center gap-1 flex-shrink-0" style="scroll-snap-align:start">
+          <div class="reward-icon bg-gradient-to-br ${r.bg} shadow-lg">
+            <span class="text-xl">${r.emoji}</span>
+          </div>
+          <span class="text-[9px] font-bold text-white/80">${r.amount}</span>
+          <span class="text-[7px] text-sp-label">${r.name}</span>
+        </div>`;
+    });
+
+    /* ── Daily Events ── */
+    const dailyEvents=[
+      {name:"Block Rush",    status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/spring-fest.png"},
+      {name:"Puzzle Frenzy",  status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/star-crown.png"},
+      {name:"Score Attack",   status:"Unfinished", sColor:"bg-amber-500", img:"./assets/images/events/arena-blitz.png"},
+      {name:"Crystal Hunt",   status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/cosmic-race.png"},
+      {name:"Time Trial",     status:"Daily",      sColor:"bg-blue-500",  img:"./assets/images/events/time-warp.png"},
+      {name:"Star Challenge", status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/lucky-draw.png"},
+    ];
+    const eventsCont=document.getElementById('dailyEventsScroll');
+    dailyEvents.forEach(ev=>{
+      eventsCont.innerHTML+=`
+        <div class="img-card flex-shrink-0 w-[150px] sm:w-[165px] md:w-[180px]" style="scroll-snap-align:start">
+          <div class="h-[100px] md:h-[120px] relative overflow-hidden">
+            <img src="${ev.img}" alt="${ev.name}" class="cover">
+            <div class="overlay"></div>
+            <span class="label top-2 left-2 text-[10px] md:text-[11px] font-black drop-shadow-lg text-white/90">${ev.name}</span>
+          </div>
+          <div class="bg-sp-card py-1.5 flex justify-center rounded-b-xl">
+            <span class="px-3 py-[3px] ${ev.sColor} rounded text-[10px] md:text-[11px] font-bold">${ev.status}</span>
+          </div>
+        </div>`;
+    });
+
+    /* ── Rank List ── */
+    const rankData=[
+      {rank:4,name:"Star_Dragon",     score:"1,920"},
+      {rank:5,name:"BlockKing99",     score:"1,850"},
+      {rank:6,name:"PuzzleMaster",    score:"1,780"},
+      {rank:7,name:"CubeWizard",      score:"1,650"},
+      {rank:8,name:"GameHero_X",      score:"1,540"},
+      {rank:9,name:"NeonPlayer",      score:"1,480"},
+      {rank:10,name:"PixelWarrior",   score:"1,390"},
+      {rank:11,name:"StarChaser",     score:"1,250"},
+      {rank:12,name:"BlockNinja",     score:"1,180"},
+    ];
+    const rankCont=document.getElementById('rankList');
+    rankData.forEach(p=>{
+      const medalColors={4:'text-blue-400',5:'text-teal-400',6:'text-indigo-400'};
+      const mc=medalColors[p.rank]||'text-sp-label';
+      rankCont.innerHTML+=`
+        <div class="rank-row">
+          <span class="w-7 text-center font-black text-[13px] ${mc}">${p.rank}</span>
+          <div class="w-8 h-8 rounded-full overflow-hidden bg-sp-card flex-shrink-0">
+            <img src="./assets/images/hero-character.png" alt="${p.name}" class="w-full h-full object-cover">
+          </div>
+          <span class="flex-1 text-[12px] font-semibold truncate">${p.name}</span>
+          <span class="text-[12px] font-bold text-sp-gold">${p.score}</span>
+        </div>`;
+    });
+
+    /* ── Related Games ── */
+    const relatedGames=[
+      {name:"Hero Adventure",   img:"./assets/images/games/hero-adventure.png",   cat:"Action"},
+      {name:"Smart Buddy",      img:"./assets/images/games/smart-buddy.png",      cat:"Puzzle"},
+      {name:"Jigpic Solitaire", img:"./assets/images/games/jigpic-solitaire.png", cat:"Card"},
+      {name:"Pixel World",      img:"./assets/images/games/pixel-world.png",      cat:"Adventure"},
+      {name:"Word Master",      img:"./assets/images/games/word-master.png",      cat:"Word"},
+      {name:"Galaxy Quest",     img:"./assets/images/games/galaxy-quest.png",     cat:"RPG"},
+    ];
+    const relCont=document.getElementById('relatedGames');
+    relatedGames.forEach(g=>{
+      relCont.innerHTML+=`
+        <a href="game-info.html" class="flex items-center gap-3 p-2 rounded-xl hover:bg-sp-hover/50 transition group cursor-pointer">
+          <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 border border-sp-border/30">
+            <img src="${g.img}" alt="${g.name}" class="w-full h-full object-cover group-hover:scale-110 transition">
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-[11px] font-bold truncate group-hover:text-white">${g.name}</p>
+            <p class="text-[9px] text-sp-label">${g.cat}</p>
+          </div>
+          <span class="text-sp-label text-[10px] group-hover:text-white transition">▶</span>
+        </a>`;
+    });
+  </script>
+</body>
+</html>
