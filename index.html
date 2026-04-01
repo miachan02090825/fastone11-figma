@@ -13,274 +13,310 @@
   </script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    html{font-size:18px}
-    body{font-family:'Nunito',sans-serif;background:#0f1225;color:#fff;overflow-x:hidden;max-width:100vw}
+    html{font-size:16px}
+    body{font-family:'Nunito',sans-serif;background:#15182e;color:#fff;overflow-x:hidden;max-width:100vw}
     ::-webkit-scrollbar{width:5px;height:5px}
     ::-webkit-scrollbar-track{background:transparent}
     ::-webkit-scrollbar-thumb{background:#4858a8;border-radius:10px}
 
+    /* Sidebar */
     .sidebar-link{transition:all .15s ease;border-radius:8px}
     .sidebar-link:hover{background:rgba(72,88,168,.2)}
     .sidebar-link.active{color:#7c9fff;font-weight:700}
     .nav-icon{width:22px;height:22px;object-fit:contain;border-radius:4px;flex-shrink:0}
 
     /* FULL-COVER IMAGE CARD */
-    .img-card{position:relative;border-radius:16px;overflow:hidden;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
+    .img-card{position:relative;border-radius:12px;overflow:hidden;cursor:pointer;transition:transform .25s ease,box-shadow .25s ease}
     .img-card:hover{transform:translateY(-4px) scale(1.015);box-shadow:0 8px 30px rgba(0,0,0,.4)}
     .img-card img.cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .4s ease}
     .img-card:hover img.cover{transform:scale(1.08)}
     .img-card .overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(15,18,37,.85) 0%,rgba(15,18,37,.3) 50%,transparent 100%)}
-    .img-card .label{position:absolute;z-index:2}
-
+    
+    /* Horizontal Scroll */
     .hscroll{overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory}
-    .hscroll::-webkit-scrollbar{height:3px}
-    .scroll-btn{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(15,18,37,.7);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;transition:background .2s}
-    .scroll-btn:hover{background:rgba(72,88,168,.6)}
+    .hscroll::-webkit-scrollbar{display:none}
+    
+    .scroll-btn-round{position:absolute;top:50%;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,.8);color:#333;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:background .2s;box-shadow:0 2px 5px rgba(0,0,0,.3)}
+    .scroll-btn-round:hover{background:#fff}
 
+    .scroll-btn-square{position:absolute;top:0;bottom:0;right:0;width:50px;background:linear-gradient(to left, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 50%, transparent 100%);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:opacity .2s;font-size:24px;border-top-right-radius:12px;border-bottom-right-radius:12px}
+    .scroll-btn-square:hover{background:linear-gradient(to left, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);color:#fff;}
+
+    /* Marquee */
     @keyframes marquee{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
     .marquee-inner{animation:marquee 20s linear infinite}
-    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
-    .float-anim{animation:float 3s ease-in-out infinite}
 
-    .hamburger-btn{display:none}
-    .sidebar-overlay{display:none}
+    /* Section title "View More" link */
+    .view-more{font-size:12px;font-weight:700;color:#7b88aa;cursor:pointer;transition:color .2s;margin-left:8px;padding-top:2px}
+    .view-more:hover{color:#a9b8eb}
+    
+    /* Layout Constants */
+    .w-sidebar { width: var(--sidebar-w, 188px); transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
     @media(max-width:1023px){
-      .hamburger-btn{display:flex}
-      #sidebar{transform:translateX(-100%);transition:transform .3s ease}
-      #sidebar.open{transform:translateX(0)}
-      .sidebar-overlay.open{display:block;position:fixed;inset:0;z-index:40;background:rgba(0,0,0,.5)}
-      main{margin-left:0!important}
+        .w-sidebar{width:0}
     }
+    
+    /* Collapsible Logic */
+    body.sidebar-collapsed { --sidebar-w: 72px; }
+    @media(max-width:1023px) { body.sidebar-collapsed { --sidebar-w: 0px; } }
+    
+    body.sidebar-collapsed .nav-text { opacity: 0; pointer-events: none; width: 0; overflow: hidden; display: none; }
+    body.sidebar-collapsed .sidebar-banners-area { display: none; }
+    body.sidebar-collapsed .sidebar-link { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
+    body.sidebar-collapsed .sidebar-link .nav-icon { margin-right: 0 !important; }
+    body.sidebar-collapsed .sidebar-header { justify-content: center !important; padding-left: 0 !important; padding-right: 0 !important; }
   </style>
 </head>
 <body class="font-body">
 
-  <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
-
   <div class="flex min-h-screen">
 
-    <!-- ========== SIDEBAR ========== -->
-    <aside id="sidebar" class="w-[180px] bg-sp-sidebar fixed top-0 left-0 bottom-0 z-50 flex flex-col border-r border-sp-border/40 overflow-hidden">
-      <div class="flex items-center gap-2 px-4 pt-4 pb-3">
-        <div class="w-9 h-9 rounded-lg bg-sp-panel border border-sp-border flex items-center justify-center text-sm font-black text-white/70">K</div>
-        <div class="leading-none">
-          <div class="text-[13px] font-black tracking-widest bg-gradient-to-r from-amber-400 via-rose-400 to-cyan-400 bg-clip-text text-transparent">STAR</div>
-          <div class="text-[13px] font-black tracking-widest bg-gradient-to-r from-cyan-400 via-emerald-400 to-amber-400 bg-clip-text text-transparent">PARTY</div>
-        </div>
+    <!-- ========== SIDEBAR (188px per Figma) ========== -->
+    <aside id="sidebar" class="w-sidebar fixed top-0 left-0 bottom-0 z-50 flex flex-col bg-[#1c203b] border-r border-sp-border/40 overflow-hidden shrink-0">
+      <div class="sidebar-header flex items-center gap-2 px-4 pt-4 pb-3 border-b border-indigo-500/20">
+        <button class="w-[32px] h-[32px] hover:brightness-125 transition focus:outline-none flex-shrink-0" onclick="document.body.classList.toggle('sidebar-collapsed')">
+            <img src="./assets/images/nav/game_other_btn_n.png" class="w-full h-full object-contain" alt="Toggle Menu">
+        </button>
       </div>
-      <nav class="flex-1 overflow-y-auto px-2 py-1 text-[16px] space-y-[3px]">
-        <a href="index.html" class="sidebar-link active flex items-center gap-3 px-3 py-[8px]"><img src="./assets/images/icons/home.png" alt="" class="nav-icon"><span>Home</span></a>
-        <a href="game-info.html" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/games.png" alt="" class="nav-icon opacity-70"><span>Games</span></a>
-        <a href="character.html" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/character.png" alt="" class="nav-icon opacity-70"><span>Character</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/gacha.png" alt="" class="nav-icon opacity-70"><span>Gacha</span></a>
-        <a href="shop.html" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/shop.png" alt="" class="nav-icon opacity-70"><span>Shop</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/rank.png" alt="" class="nav-icon opacity-70"><span>Rank</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/starcards.png" alt="" class="nav-icon opacity-70"><span>StarCards</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/playground.png" alt="" class="nav-icon opacity-70"><span>PlayGround</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/event.png" alt="" class="nav-icon opacity-70"><span>EventCenter</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/reward.png" alt="" class="nav-icon opacity-70"><span>RewardCenter</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/achievement.png" alt="" class="nav-icon opacity-70"><span>Achievement</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/inventory.png" alt="" class="nav-icon opacity-70"><span>Inventory</span></a>
-        <div class="border-t border-white/5 my-2"></div>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/action.png" alt="" class="nav-icon opacity-70"><span>Action</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/match.png" alt="" class="nav-icon opacity-70"><span>Match</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/puzzle.png" alt="" class="nav-icon opacity-70"><span>Puzzle</span></a>
-        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-sp-label"><img src="./assets/images/icons/multiplayer.png" alt="" class="nav-icon opacity-70"><span>Multiplayer</span></a>
+      <nav class="flex-1 overflow-y-auto px-1.5 py-2 text-[14px] space-y-[1px]" style="font-family: 'Horizontal', sans-serif;">
+        <a href="index.html" class="sidebar-link active flex items-center gap-3 px-3 py-[8px] bg-[#2a2d5e]/40 rounded-lg"><img src="./assets/images/icons/icon_home_o.png" alt="" class="nav-icon"><span class="nav-text">Home</span></a>
+        <a href="game-info.html" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_game.png" alt="" class="nav-icon"><span class="nav-text">Games</span></a>
+        <a href="character.html" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Character.png" alt="" class="nav-icon"><span class="nav-text">Character</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon-gacha.png" alt="" class="nav-icon"><span class="nav-text">Gacha</span></a>
+        <a href="shop.html" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Shop.png" alt="" class="nav-icon"><span class="nav-text">Shop</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Rank.png" alt="" class="nav-icon"><span class="nav-text">Rank</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_StarCards.png" alt="" class="nav-icon"><span class="nav-text">StarCards</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_PlayGround.png" alt="" class="nav-icon"><span class="nav-text">Play Ground</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_DailyRewards.png" alt="" class="nav-icon"><span class="nav-text">Daily Rewards</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_RewardCenter.png" alt="" class="nav-icon"><span class="nav-text">Reward Center</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Achievement.png" alt="" class="nav-icon"><span class="nav-text">Achievement</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Inventory.png" alt="" class="nav-icon"><span class="nav-text">Inventory</span></a>
+        
+        <div class="h-[1px] w-[80%] mx-auto bg-white/10 my-1"></div>
+        
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Action.png" alt="" class="nav-icon"><span class="nav-text">Action</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Match.png" alt="" class="nav-icon"><span class="nav-text">Match</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Puzzle.png" alt="" class="nav-icon"><span class="nav-text">Puzzle</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Multiplayer.png" alt="" class="nav-icon"><span class="nav-text">Multiplayer</span></a>
+        <a href="#" class="sidebar-link flex items-center gap-3 px-3 py-[8px] text-[#ffffff]"><img src="./assets/images/icons/icon_Others.png" alt="" class="nav-icon"><span class="nav-text">Others</span></a>
       </nav>
-      <div class="px-2 pb-3 space-y-2">
-        <div class="float-anim rounded-lg h-[48px] bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center cursor-pointer text-[14px] font-bold overflow-hidden">⭐ ALL-STARS</div>
-        <div class="float-anim rounded-lg h-[48px] bg-gradient-to-r from-purple-600 to-pink-600 flex items-center justify-center cursor-pointer text-[14px] font-bold overflow-hidden" style="animation-delay:.4s">⭐ ALL-STARS</div>
-        <div class="float-anim rounded-lg h-[48px] bg-gradient-to-r from-pink-600 to-red-500 flex items-center justify-center cursor-pointer text-[14px] font-bold overflow-hidden" style="animation-delay:.8s">⭐ ALL-STARS</div>
+      <!-- Bottom Side Banners -->
+      <div class="px-2 pb-4 space-y-2 sidebar-banners-area">
+        <div class="rounded-lg relative overflow-hidden cursor-pointer shadow-md transition transform hover:scale-[1.02]">
+            <img src="./assets/images/sidebar_banner_1.png" class="w-full h-auto block">
+        </div>
+        <div class="rounded-lg relative overflow-hidden cursor-pointer shadow-md transition transform hover:scale-[1.02]">
+            <img src="./assets/images/sidebar_banner_2.png" class="w-full h-auto block">
+        </div>
       </div>
     </aside>
 
     <!-- ========== MAIN ========== -->
-    <main class="flex-1 ml-0 lg:ml-[180px] min-h-screen flex flex-col overflow-x-hidden">
+    <main class="flex-1 min-h-screen flex flex-col overflow-x-hidden bg-[#15182e] pb-10" style="margin-left: var(--sidebar-w, 188px); transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
 
-      <!-- Top Bar -->
-      <header class="sticky top-0 z-40 bg-sp-bg/85 backdrop-blur-xl border-b border-sp-border/30">
-        <div class="flex items-center px-3 md:px-4 py-2 gap-2 md:gap-3">
-          <button class="hamburger-btn w-8 h-8 rounded-lg bg-sp-panel items-center justify-center" onclick="toggleSidebar()"><span class="text-white text-sm">☰</span></button>
-          <div class="flex-1 flex items-center bg-indigo-800/40 rounded-full px-2 md:px-3 py-1.5 mr-1 md:mr-3 overflow-hidden">
-            <div class="w-5 h-5 md:w-6 md:h-6 rounded-full bg-indigo-700 flex items-center justify-center flex-shrink-0 mr-1.5 md:mr-2 overflow-hidden">
-              <img src="./assets/images/icons/event.png" alt="" class="w-3 h-3 object-contain">
+      <!-- Top Bar (60px per Figma) -->
+      <header class="sticky top-0 z-40 bg-[#1c203b]/95 backdrop-blur-sm border-b border-[#282d56] h-[60px] flex items-center">
+        <div class="flex items-center w-full px-4 relative">
+          <!-- Marquee Announcement (Centered) -->
+          <div class="flex-1 flex items-center bg-[#101227] rounded-full px-3 py-1.5 mx-auto max-w-[800px] border border-white/5 overflow-hidden">
+            <div class="w-5 h-5 flex items-center justify-center flex-shrink-0 mr-2">
+                <img src="./assets/images/nav_broadcast.png" class="w-full h-full object-contain" alt="Broadcast">
             </div>
-            <div class="overflow-hidden flex-1 whitespace-nowrap">
-              <span class="marquee-inner inline-block text-[15px] md:text-[17px]">System Announcement: 123 Test~~~Test 123!!! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System Announcement: 123 Test~~~Test 123!!!</span>
+            <div class="overflow-hidden flex-1 whitespace-nowrap text-[#ffffff] font-semibold text-[13px]">
+              <span class="marquee-inner inline-block">System Announcement: 123 Test~~~Test 123!!! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System Announcement: 123 Test~~~Test 123!!!</span>
             </div>
           </div>
-          <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/multiplayer.png" alt="Chat" class="w-3.5 h-3.5 object-contain"></button>
-          <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/reward.png" alt="Mail" class="w-3.5 h-3.5 object-contain"></button>
-          <button class="w-7 h-7 md:w-8 md:h-8 rounded-lg bg-sp-panel hover:bg-sp-hover transition flex items-center justify-center"><img src="./assets/images/icons/gacha.png" alt="Settings" class="w-3.5 h-3.5 object-contain"></button>
+
+          <!-- Top Right Action Icons -->
+          <div class="absolute right-6 flex items-center gap-5">
+             <button class="w-[28px] h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_message.png" class="w-full h-full object-contain" alt="Messages"></button>
+             <button class="w-[28px] h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_mail.png" class="w-full h-full object-contain" alt="Mail"></button>
+             <button class="w-[28px] h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_settings.png" class="w-full h-full object-contain" alt="Settings"></button>
+          </div>
         </div>
       </header>
 
-      <!-- Content -->
-      <div class="flex-1 p-3 md:p-4 lg:p-6 space-y-5 md:space-y-7 lg:space-y-10">
+      <!-- ========== LAYOUT CONTAINER (Padding Top/Bot 16px, Left/Right 16px) ========== -->
+      <div class="p-4 flex flex-col gap-6 w-full max-w-[1720px] mx-auto overflow-hidden">
 
-        <!-- ROW 1: Information + News -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4">
-          <!-- Information (Player Card) -->
-          <div class="md:col-span-4">
-            <h2 class="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white/90">Information</h2>
-            <div class="img-card h-[250px] md:h-[310px]">
-              <img src="./assets/images/hero-character.png" alt="Player Character" class="cover">
-              <div class="overlay"></div>
-              <div class="label bottom-3 left-3 right-3 flex items-center gap-2.5">
-                <div class="relative flex-shrink-0">
-                  <div class="w-10 h-10 md:w-11 md:h-11 rounded-full border-2 border-sp-gold overflow-hidden bg-sp-card">
-                    <img src="./assets/images/hero-character.png" alt="Avatar" class="w-full h-full object-cover">
-                  </div>
-                  <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-green-400 border border-sp-bg flex items-center justify-center text-[7px]">🌱</div>
+        <!-- ＝＝＝＝ TOP ROW (2 Columns - Info & News+Events) ＝＝＝＝ -->
+        <div class="flex gap-4 w-full">
+            
+            <!-- LEFT COLUMN: Information (Doll Box) -->
+            <div class="w-[344px] flex-shrink-0 flex flex-col gap-2">
+                <h2 class="text-[18px] font-extrabold text-[#f1f2f6] px-1">Information</h2>
+                <!-- Doll Card -->
+                <div class="flex-1 rounded-2xl flex flex-col bg-[#2e3163] relative overflow-hidden shadow-xl min-h-[300px]">
+                    <!-- Image Area -->
+                    <div class="relative w-full h-[72%] bg-gradient-to-b from-orange-400 to-orange-300 pattern-dots overflow-hidden rounded-b-xl border-b border-black/10 z-10">
+                        <!-- Simulated character cover image -->
+                        <img src="./assets/images/hero-character.png" alt="Doll" class="absolute inset-0 w-full h-full object-cover">
+                    </div>
+                    
+                    <!-- Profile Info Area -->
+                    <div class="relative flex-1 bg-[#282a5d] px-4 pt-1 pb-3 flex items-center shadow-inner z-20">
+                        <!-- Avatar -->
+                        <div class="absolute -top-[34px] left-3 w-[64px] h-[64px] rounded-full border-[3px] border-[#fbbf24] bg-white overflow-hidden shadow-[0_4px_10px_rgba(0,0,0,0.5)] z-30">
+                            <!-- Avatar placeholder -->
+                            <img src="./assets/images/hero-character.png" class="w-full h-full object-cover">
+                        </div>
+
+                        <!-- User details -->
+                        <div class="flex-1 pl-[70px] flex flex-col justify-center h-full pt-1">
+                            <h3 class="font-extrabold text-[20px] text-white leading-none">User Name</h3>
+                            <!-- Progress XP Bar -->
+                            <div class="relative h-[12px] bg-[#1a1c3b] rounded-full flex items-center mt-[10px] w-[130px] border border-black/30">
+                                <!-- Level Star -->
+                                <div class="absolute -left-[14px] top-1/2 -translate-y-1/2 flex items-center justify-center w-[30px] h-[30px] drop-shadow-md z-10">
+                                    <svg viewBox="0 0 24 24" fill="currentColor" class="text-amber-500 w-full h-full drop-shadow"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                                    <span class="absolute text-[10px] font-black text-[#5e2d09] tracking-tighter mt-0.5" style="text-shadow: 0 0 1px rgba(255,255,255,0.5)">100</span>
+                                </div>
+                                <!-- Bar Fill -->
+                                <div class="h-full bg-gradient-to-r from-amber-200 to-amber-500 rounded-full" style="width: 75%;"></div>
+                                <!-- Bar Text -->
+                                <div class="absolute inset-0 flex items-center justify-center text-[8px] font-black text-white/90" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8)">1234 / 1234</div>
+                            </div>
+                        </div>
+
+                        <!-- Profile Button -->
+                        <button class="ml-2 flex flex-col items-center justify-center bg-[#424578] hover:bg-[#525691] border border-[#5d609a] text-white rounded-full px-3 py-1.5 shadow-sm transition">
+                            <span class="text-[12px] font-bold flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-white/80" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path></svg>
+                                Profile
+                            </span>
+                        </button>
+                    </div>
                 </div>
-                <div class="flex-1 min-w-0">
-                  <p class="font-bold text-sm md:text-base leading-tight truncate">User Name</p>
-                  <p class="text-[13px] md:text-[14px] text-sp-gold leading-tight">⭐⭐ +$&*_$&*_</p>
-                </div>
-                <button class="flex items-center gap-1 bg-white text-sp-bg px-3 md:px-3.5 py-1.5 rounded-full text-[13px] md:text-[14px] font-bold hover:bg-gray-200 transition flex-shrink-0 shadow-lg">✏️ Edit</button>
-              </div>
             </div>
-          </div>
-          <!-- News (Bento grid) -->
-          <div class="md:col-span-8">
-            <h2 class="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white/90">News</h2>
-            <div class="grid grid-cols-2 lg:grid-cols-12 gap-2 md:gap-2.5 h-auto lg:h-[310px]">
-              <div class="col-span-2 lg:col-span-7 img-card h-[180px] lg:h-auto">
-                <img src="./assets/images/news-main.png" alt="bloxd.io" class="cover">
-                <div class="overlay"></div>
-                <span class="label bottom-3 left-3 text-2xl md:text-3xl font-black drop-shadow-lg">bloxd.io</span>
-              </div>
-              <div class="col-span-2 lg:col-span-5 grid grid-rows-2 gap-2 md:gap-2.5">
-                <div class="grid grid-cols-2 gap-2 md:gap-2.5">
-                  <div class="img-card h-[80px] md:h-auto"><img src="./assets/images/game-grassland.png" alt="GrassLand" class="cover"><div class="overlay"></div><span class="label bottom-1.5 left-2 text-[13px] md:text-[14px] font-bold drop-shadow">GrassLand</span></div>
-                  <div class="img-card h-[80px] md:h-auto"><img src="./assets/images/game-find-diff.png" alt="Find the Differences" class="cover"><div class="overlay"></div><span class="label bottom-1.5 left-2 text-[13px] md:text-[14px] font-bold drop-shadow">Find the Differences</span></div>
+
+            <!-- RIGHT COLUMN: News + Event Lists -->
+            <div class="flex-1 flex flex-col gap-4 min-w-0">
+                <!-- News -->
+                <div class="flex flex-col gap-2">
+                    <h2 class="text-[18px] font-extrabold text-[#f1f2f6] px-1">News</h2>
+                    <!-- News Carousel -->
+                    <div class="relative w-full h-[184px] bg-[#1a1c3b] rounded-2xl overflow-hidden shadow-lg flex items-center justify-center">
+                        <!-- Peeking Left Image -->
+                        <div class="absolute left-[-200px] top-0 bottom-0 w-[400px] opacity-20 transform scale-90 blur-[2px] transition pointer-events-none">
+                            <img src="./assets/images/news-main.png" class="w-full h-full object-cover rounded-xl">
+                        </div>
+                        <!-- Main Central Banner -->
+                        <div class="relative w-full h-full max-w-[950px] mx-auto rounded-xl overflow-hidden shadow-2xl z-10 transition-transform">
+                            <img src="./assets/images/news-main.png" alt="News Banner" class="w-full h-full object-cover object-center">
+                            <!-- Dots -->
+                            <div class="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
+                                <div class="w-2 h-2 rounded-full bg-white shadow"></div>
+                                <div class="w-2 h-2 rounded-full bg-white/40 shadow"></div>
+                                <div class="w-2 h-2 rounded-full bg-white/40 shadow"></div>
+                            </div>
+                        </div>
+                        <!-- Peeking Right Image -->
+                        <div class="absolute right-[-200px] top-0 bottom-0 w-[400px] opacity-20 transform scale-90 blur-[2px] transition pointer-events-none">
+                            <img src="./assets/images/news-main.png" class="w-full h-full object-cover rounded-xl">
+                        </div>
+
+                        <!-- Left / Right Nav Buttons -->
+                        <button class="scroll-btn-round left-4"><span class="font-bold text-[14px] opacity-80">◀</span></button>
+                        <button class="scroll-btn-round right-4"><span class="font-bold text-[14px] opacity-80">▶</span></button>
+                    </div>
                 </div>
-                <div class="grid grid-cols-3 gap-2 md:gap-2.5">
-                  <div class="img-card h-[70px] md:h-auto"><img src="./assets/images/games/join-clash.png" alt="TrailHero" class="cover"><div class="overlay"></div><span class="label bottom-1.5 inset-x-0 text-center text-[13px] md:text-[14px] font-black drop-shadow">TrailHero</span></div>
-                  <div class="img-card h-[70px] md:h-auto"><img src="./assets/images/games/pet-kingdom.png" alt="Merge Munch" class="cover"><div class="overlay"></div><span class="label bottom-1.5 inset-x-0 text-center text-[12px] md:text-[13px] font-bold uppercase tracking-wider drop-shadow">Merge Munch</span></div>
-                  <div class="img-card h-[70px] md:h-auto"><img src="./assets/images/games/pixel-world.png" alt="Cauliflower" class="cover"><div class="overlay"></div><span class="label bottom-1.5 inset-x-0 text-center text-[12px] md:text-[13px] font-bold uppercase drop-shadow">Cauliflower</span></div>
+
+                <!-- Event Lists -->
+                <div class="flex flex-col gap-2 flex-1">
+                    <div class="flex items-center gap-2 px-1">
+                        <h2 class="text-[18px] font-extrabold text-[#f1f2f6]">Event Lists</h2>
+                        <a href="#" class="view-more">View More ▸</a>
+                    </div>
+                    <!-- Horizontal Scroll Row -->
+                    <div class="relative flex-1">
+                        <div id="eventScroll" class="hscroll flex gap-4 w-full h-full pb-1 items-stretch">
+                            <!-- Event cards rendered via JS to match Figma full cover style -->
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
+
         </div>
 
-        <!-- ROW 2: Event Lists — FULL-COVER IMAGE CARDS -->
-        <div>
-          <h2 class="text-sm md:text-base font-bold mb-2 md:mb-3 text-white/90">Event Lists</h2>
-          <div class="relative">
-            <div id="eventScroll" class="hscroll flex gap-2.5 md:gap-3 pb-1"></div>
-            <button onclick="document.getElementById('eventScroll').scrollBy({left:400,behavior:'smooth'})" class="scroll-btn right-0"><span class="text-xs">▶</span></button>
-          </div>
-        </div>
 
-        <!-- ROW 3: Banner + Categories — FULL-COVER IMAGE CARDS -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-4">
-          <div class="lg:col-span-4">
-            <h2 class="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white/90">Banner</h2>
-            <div class="img-card h-[90px] md:h-[110px]">
-              <img src="./assets/images/games/clash-quest.png" alt="Clash Quest" class="cover">
-              <div class="overlay"></div>
-              <div class="label bottom-0 left-0 right-0 p-3 md:p-4 flex items-center gap-3 md:gap-4">
-                <div class="w-[50px] h-[50px] md:w-[60px] md:h-[60px] rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center flex-shrink-0 shadow-lg border border-white/10">
-                  <span class="font-black text-base md:text-lg drop-shadow">CQ</span>
-                </div>
-                <div>
-                  <p class="font-black text-base md:text-lg tracking-wide leading-tight drop-shadow-lg">CLASH QUEST</p>
-                  <p class="text-[13px] md:text-[14px] text-white/60 mt-0.5">Epic battles await</p>
-                </div>
-              </div>
+        <!-- ＝＝＝＝ MIDDLE ROW (Full Width Scroll - Continue Games) ＝＝＝＝ -->
+        <div class="flex flex-col gap-2 w-full mt-2">
+            <div class="flex items-center gap-2 px-1">
+                <h2 class="text-[18px] font-extrabold text-[#f1f2f6]">Continue Games</h2>
+                <a href="#" class="view-more">View More ▸</a>
             </div>
-          </div>
-          <div class="lg:col-span-8">
-            <h2 class="text-lg md:text-xl font-bold mb-2 md:mb-3 text-white/90 lg:invisible">Categories</h2>
-            <div id="catGrid" class="grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3 h-auto lg:h-[110px]"></div>
-          </div>
+            <div class="relative w-full">
+                <div id="continueScroll" class="hscroll flex gap-4 w-full pb-1"></div>
+                <button onclick="document.getElementById('continueScroll').scrollBy({left:500,behavior:'smooth'})" class="scroll-btn-square right-0 text-white font-bold pb-1">›</button>
+            </div>
         </div>
 
-        <!-- ROW 4: Continue Games — FULL-COVER IMAGE CARDS -->
-        <div>
-          <h2 class="text-sm md:text-base font-bold mb-2 md:mb-3 text-white/90">Continue Games</h2>
-          <div class="relative">
-            <div id="continueScroll" class="hscroll flex gap-2.5 md:gap-3 pb-1"></div>
-            <button onclick="document.getElementById('continueScroll').scrollBy({left:400,behavior:'smooth'})" class="scroll-btn right-0"><span class="text-xs">▶</span></button>
-          </div>
+        <!-- ＝＝＝＝ BOTTOM ROW (Full Width Scroll - Favorites Games) ＝＝＝＝ -->
+        <div class="flex flex-col gap-2 w-full mt-1">
+            <div class="flex items-center gap-2 px-1">
+                <h2 class="text-[18px] font-extrabold text-[#f1f2f6]">Favorites Games</h2>
+                <a href="#" class="view-more">View More ▸</a>
+            </div>
+            <div class="relative w-full">
+                <div id="favScroll" class="hscroll flex gap-4 w-full pb-2"></div>
+                <button onclick="document.getElementById('favScroll').scrollBy({left:500,behavior:'smooth'})" class="scroll-btn-square right-0 text-white font-bold pb-2">›</button>
+            </div>
         </div>
 
       </div>
     </main>
   </div>
 
+  <!-- Javascript for Dynamic Rendering -->
   <script>
-    function toggleSidebar(){document.getElementById('sidebar').classList.toggle('open');document.getElementById('sidebarOverlay').classList.toggle('open')}
-
-    /* ── Event Cards: Full-Cover Image Cards ── */
+    /* ========== Event Lists (Render Full-Cover Figma Style) ========== */
     const events=[
-      {name:"Spring Fest", status:"Active",      sColor:"bg-green-500", img:"./assets/images/events/spring-fest.png"},
-      {name:"Time Warp",   status:"Limited Time", sColor:"bg-red-500",   img:"./assets/images/events/time-warp.png"},
-      {name:"Star Crown",  status:"Active",      sColor:"bg-green-500", img:"./assets/images/events/star-crown.png"},
-      {name:"Arena Blitz",  status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/arena-blitz.png"},
-      {name:"Cosmic Race",  status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/cosmic-race.png"},
-      {name:"Frost Event",  status:"Limited Time",sColor:"bg-red-500",   img:"./assets/images/events/frost.png"},
-      {name:"Lucky Draw",   status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/lucky-draw.png"},
-      {name:"Galaxy Tour",  status:"Active",     sColor:"bg-green-500", img:"./assets/images/events/galaxy-tour.png"},
+      {img:"./assets/images/event_list_1.png"},
+      {img:"./assets/images/event_list_2.png"},
+      {img:"./assets/images/event_list_3.png"},
+      {img:"./assets/images/event_list_1.png"} // Repeat for horizontal scroll effect
     ];
     const eCont=document.getElementById('eventScroll');
     events.forEach(ev=>{
       eCont.innerHTML+=`
-        <div class="img-card flex-shrink-0 w-[190px] sm:w-[210px] md:w-[240px]" style="scroll-snap-align:start">
-          <div class="h-[130px] md:h-[155px] relative overflow-hidden">
-            <img src="${ev.img}" alt="${ev.name}" class="cover">
-            <div class="overlay"></div>
-            <span class="label top-3 left-3 text-[15px] md:text-[16px] font-black drop-shadow-lg text-white/90">${ev.name}</span>
-          </div>
-          <div class="bg-sp-card py-2.5 flex justify-center rounded-b-xl">
-            <span class="px-4 py-[5px] ${ev.sColor} rounded text-[14px] md:text-[15px] font-bold">${ev.status}</span>
-          </div>
+        <div class="img-card shrink-0 flex-1 min-w-[220px] sm:min-w-[260px] aspect-[16/9] bg-transparent shadow-lg">
+           <img src="${ev.img}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;transition:transform .4s ease" onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
         </div>`;
     });
 
-    /* ── Category Cards: Full-Cover Image Cards ── */
-    const categories=[
-      {name:"Action",      img:"./assets/images/categories/action.png"},
-      {name:"Match",       img:"./assets/images/categories/match.png"},
-      {name:"Puzzle",      img:"./assets/images/categories/puzzle.png"},
-      {name:"Multiplayer", img:"./assets/images/categories/multiplayer.png"},
-      {name:"Others",      img:"./assets/images/categories/others.png"},
-    ];
-    const catCont=document.getElementById('catGrid');
-    categories.forEach(c=>{
-      catCont.innerHTML+=`
-        <div class="img-card h-[80px] md:h-full">
-          <img src="${c.img}" alt="${c.name}" class="cover">
-          <div class="overlay"></div>
-          <span class="label bottom-2 inset-x-0 text-center text-[15px] md:text-base font-bold drop-shadow-lg">${c.name}</span>
-        </div>`;
-    });
-
-    /* ── Continue Games: Full-Cover Image Cards ── */
+    /* ========== Continue Games (Clean Rectangle Images) ========== */
     const games=[
-      {name:"Hero Adventure",   img:"./assets/images/games/hero-adventure.png"},
-      {name:"Smart Buddy",      img:"./assets/images/games/smart-buddy.png"},
-      {name:"Pixel World",      img:"./assets/images/games/pixel-world.png"},
-      {name:"Jigpic Solitaire", img:"./assets/images/games/jigpic-solitaire.png"},
-      {name:"Join Clash",       img:"./assets/images/games/join-clash.png"},
-      {name:"Word Master",      img:"./assets/images/games/word-master.png"},
-      {name:"Galaxy Quest",     img:"./assets/images/games/galaxy-quest.png"},
-      {name:"Pet Kingdom",      img:"./assets/images/games/pet-kingdom.png"},
-      {name:"Speed Racer",      img:"./assets/images/games/speed-racer.png"},
+      {name:"Game 1", img:"./assets/images/games/game-icon-s.png"},
+      {name:"Game 2", img:"./assets/images/games/game-icon-s-1.png"},
+      {name:"Game 3", img:"./assets/images/games/game-icon-s-2.png"},
+      {name:"Game 4", img:"./assets/images/games/game-icon-s-3.png"},
+      {name:"Game 5", img:"./assets/images/games/game-icon-s-4.png"},
+      {name:"Game 6", img:"./assets/images/games/game-icon-s-5.png"},
+      {name:"Game 7", img:"./assets/images/games/game-icon-s.png"}
     ];
     const gCont=document.getElementById('continueScroll');
     games.forEach(g=>{
       gCont.innerHTML+=`
-        <div class="img-card flex-shrink-0 w-[190px] sm:w-[210px] md:w-[240px]" style="scroll-snap-align:start">
-          <div class="h-[110px] md:h-[130px] relative overflow-hidden rounded-t-xl">
-            <img src="${g.img}" alt="${g.name}" class="cover">
-            <div class="overlay"></div>
-          </div>
-          <div class="bg-sp-card px-3 py-2.5 rounded-b-xl">
-            <p class="text-[14px] md:text-[15px] font-semibold truncate">${g.name}</p>
-          </div>
+        <div class="img-card shrink-0 shadow-lg" style="width:calc(16.666% - 14px); min-width:160px; height:120px;">
+          <img src="${g.img}" alt="${g.name}" class="cover">
+        </div>`;
+    });
+
+    /* ========== Favorites Games (With Pill Tags Top-Left) ========== */
+    const favGames=[
+      {img:"./assets/images/games/game-icon-s-5.png"},
+      {img:"./assets/images/games/game-icon-s-3.png"},
+      {img:"./assets/images/games/game-icon-border.png"},
+      {img:"./assets/images/games/game-icon-border-1.png"},
+      {img:"./assets/images/games/game-icon-border-2.png"},
+      {img:"./assets/images/games/image_750.png"},
+      {img:"./assets/images/games/game-icon-border.png"} // Repeat one for swiper scroll feeling
+    ];
+    const fCont=document.getElementById('favScroll');
+    favGames.forEach(f=>{
+      fCont.innerHTML+=`
+        <div class="img-card shrink-0 shadow-lg" style="width:calc(16.666% - 14px); min-width:160px; height:120px;">
+          <img src="${f.img}" class="cover">
         </div>`;
     });
   </script>
