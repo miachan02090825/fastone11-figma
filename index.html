@@ -112,26 +112,33 @@
     </aside>
 
     <!-- ========== MAIN ========== -->
-    <main class="flex-1 min-h-screen flex flex-col overflow-x-hidden bg-[#15182e] pb-10" style="margin-left: var(--sidebar-w, 188px); transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
+    <main class="flex-1 min-h-screen flex flex-col bg-[#15182e] pb-10" style="margin-left: var(--sidebar-w, 188px); transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);">
 
-      <!-- Top Bar (60px per Figma) -->
-      <header class="sticky top-0 z-40 bg-[#1c203b]/95 backdrop-blur-sm border-b border-[#282d56] h-[60px] flex items-center">
-        <div class="flex items-center w-full px-4 relative">
-          <!-- Marquee Announcement (Centered) -->
-          <div class="flex-1 flex items-center bg-[#101227] rounded-full px-3 py-1.5 mx-auto max-w-[800px] border border-white/5 overflow-hidden">
-            <div class="w-5 h-5 flex items-center justify-center flex-shrink-0 mr-2">
-                <img src="./assets/images/nav_broadcast.png" class="w-full h-full object-contain" alt="Broadcast">
-            </div>
-            <div class="overflow-hidden flex-1 whitespace-nowrap text-[#ffffff] font-semibold text-[13px]">
-              <span class="marquee-inner inline-block">System Announcement: 123 Test~~~Test 123!!! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System Announcement: 123 Test~~~Test 123!!!</span>
+      <!-- Top Bar (Shared) -->
+      <header class="sticky top-0 z-40 w-full bg-[#1c203b]/95 backdrop-blur-sm border-b border-[#282d56] h-[60px] flex items-center">
+        <div class="flex items-center justify-between w-full px-4 gap-3">
+          <!-- Mobile Hamburger -->
+          <button class="hamburger-btn w-8 h-8 rounded-lg bg-[#2e3163] flex items-center justify-center lg:hidden shrink-0" onclick="document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sidebarOverlay') && document.getElementById('sidebarOverlay').classList.toggle('open');">
+             <span class="text-white text-sm">☰</span>
+          </button>
+          
+          <!-- Marquee Announcement (Centered visually) -->
+          <div class="flex-1 flex justify-center min-w-0">
+            <div class="w-full max-w-[800px] flex items-center bg-[#101227] rounded-full px-3 py-1.5 border border-white/5 overflow-hidden shadow-inner">
+              <div class="w-5 h-5 flex items-center justify-center flex-shrink-0 mr-2 drop-shadow-sm">
+                  <img src="./assets/images/nav_broadcast.png" class="w-full h-full object-contain" alt="Broadcast">
+              </div>
+              <div class="overflow-hidden flex-1 whitespace-nowrap text-[#ffffff] font-semibold text-[13px]">
+                <span class="marquee-inner inline-block tracking-wider">System Announcement: 123 Test~~~Test 123!!! &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; System Announcement: 123 Test~~~Test 123!!!</span>
+              </div>
             </div>
           </div>
 
           <!-- Top Right Action Icons -->
-          <div class="absolute right-6 flex items-center gap-5">
-             <button class="w-[28px] h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_message.png" class="w-full h-full object-contain" alt="Messages"></button>
-             <button class="w-[28px] h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_mail.png" class="w-full h-full object-contain" alt="Mail"></button>
-             <button class="w-[28px] h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_settings.png" class="w-full h-full object-contain" alt="Settings"></button>
+          <div class="flex items-center gap-3 lg:gap-5 ml-4 shrink-0">
+             <button class="w-[24px] h-[24px] lg:w-[28px] lg:h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_message.png" class="w-full h-full object-contain" alt="Messages"></button>
+             <button class="w-[24px] h-[24px] lg:w-[28px] lg:h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_mail.png" class="w-full h-full object-contain" alt="Mail"></button>
+             <button class="w-[24px] h-[24px] lg:w-[28px] lg:h-[28px] hover:scale-110 transition hover:brightness-125 focus:outline-none"><img src="./assets/images/nav_settings.png" class="w-full h-full object-contain" alt="Settings"></button>
           </div>
         </div>
       </header>

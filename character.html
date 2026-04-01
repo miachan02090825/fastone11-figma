@@ -234,99 +234,348 @@
         </div>
 
         <!-- ====== RIGHT PANEL (Details / Gacha / Skins / Stats) ====== -->
-        <div class="hidden lg:flex w-[340px] flex-col p-4 bg-[#1b1e42] border-l border-sp-border/50 shadow-2xl flex-shrink-0 h-full overflow-y-auto">
+        <div class="hidden lg:flex w-[390px] xl:w-[410px] flex-col bg-[#1b1d42] border-l border-white/5 shadow-2xl flex-shrink-0 relative overflow-y-auto h-[calc(100vh-60px)] custom-scrollbar">
           
-          <!-- SSR Card -->
-          <div class="relative rounded-[20px] overflow-hidden mb-3 shadow-[0_10px_30px_rgba(255,166,0,0.15)] border-[3px] border-[#48508e]">
-            <div class="h-[250px] xl:h-[280px] bg-gradient-to-b from-[#f9a03c] via-[#fac658] to-[#df720e] relative flex flex-col justify-between items-center z-0 pt-2 pb-2">
-              
-              <!-- Subtle radial glow behind character -->
-              <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.7)_0%,transparent_60%)] z-0 mix-blend-overlay"></div>
+  <div class="relative w-full h-full  mx-auto bg-sp-card   overflow-hidden flex flex-col z-10 border border-white/5 animate-[fadeInUp_0.4s_ease-out]">
+    
+    <!-- Header/Hero Section -->
+    <div class="relative h-[380px] w-full bg-gradient-to-b from-[#fba522] via-[#f7881c] to-[#df720e] flex items-center justify-center p-4 overflow-hidden">
+      
+      
 
-              <!-- Top SSR Badge -->
-              <div class="absolute top-2 left-4 z-20">
-                <span class="text-[54px] xl:text-[60px] font-black italic text-transparent bg-clip-text" style="background-image: linear-gradient(180deg, #FFFFFF 0%, #FFD700 100%); -webkit-text-stroke: 1.5px #cf5a00; filter: drop-shadow(0 4px 5px rgba(200, 80, 0, 0.6)); line-height: 1;">SSR</span>
-              </div>
-              
-              <!-- Character Image -->
-              <div class="absolute inset-0 flex items-center justify-center pt-8 z-10 w-[140%] -left-[20%]">
-                <img src="./assets/images/characters/role (1).png" alt="Magic Conny" class="h-full object-contain drop-shadow-[0_15px_25px_rgba(0,0,0,0.5)] transform scale-[1.05]">
-              </div>
+      <!-- Radial Background Element -->
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.6)_0%,transparent_60%)] mix-blend-overlay pointer-events-none"></div>
 
-              <!-- Character Info Overlay -->
-              <div class="absolute bottom-0 left-0 right-0 z-20 flex flex-col items-center pb-3 bg-gradient-to-t from-black/80 via-black/40 to-transparent pt-12">
-                <div class="flex items-center gap-2 mb-0.5">
-                  <span class="text-rose-400 text-lg drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">❤️</span>
-                  <span class="text-xl font-black text-white tracking-wide" style="text-shadow: 2px 2px 0px rgba(0,0,0,1), -1px -1px 0px rgba(0,0,0,1), 1px -1px 0px rgba(0,0,0,1), -1px 1px 0px rgba(0,0,0,1);">Magic Conny</span>
-                </div>
-                <p class="text-[11px] text-white/90 font-bold mb-1" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">CV : Evan Hartwell</p>
-                <div class="flex gap-1">
-                  <span class="text-[#f5a623] text-[13px]" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⭐</span>
-                  <span class="text-[#f5a623] text-[13px]" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⭐</span>
-                  <span class="text-[#f5a623] text-[13px]" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">⭐</span>
-                  <span class="text-black/50 text-[13px]" style="text-shadow: 1px 1px 1px rgba(255,255,255,0.2);">⭐</span>
-                  <span class="text-black/50 text-[13px]" style="text-shadow: 1px 1px 1px rgba(255,255,255,0.2);">⭐</span>
-                </div>
-                
-                <!-- Eye icon bottom right -->
-                <div class="absolute bottom-3 right-3 text-white hover:text-[#f5a623] cursor-pointer w-6 h-6 rounded-lg bg-black/40 flex items-center justify-center backdrop-blur-sm shadow border border-white/20 transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                </div>
-              </div>
+      <!-- SSR Badge (Top Left) -->
+      <div class="absolute top-4 left-5 z-20 drop-shadow-[0_4px_6px_rgba(200,80,0,0.6)]">
+        <span class="text-[64px] font-black italic text-transparent bg-clip-text leading-none tracking-tighter" style="background-image: linear-gradient(180deg, #FFFFFF 0%, #FFD700 100%); -webkit-text-stroke: 1.5px #cf5a00;">SSR</span>
+      </div>
 
+      <!-- Level Star Badge (Top Right) -->
+      <div class="absolute top-5 right-14 z-20 flex justify-center items-center drop-shadow-[0_4px_6px_rgba(0,0,0,0.4)]">
+        <svg class="w-11 h-11 text-[#ffcc00] drop-shadow-md" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
+        </svg>
+        <span class="absolute text-[16px] font-black text-[#5c3000] z-10 mt-1">20</span>
+      </div>
+
+      <!-- Character Image -->
+      <img src="./assets/images/characters/role (1).png" alt="Magic Conny" class="relative z-10 h-[115%] object-contain drop-shadow-[0_20px_30px_rgba(0,0,0,0.5)] translate-y-4">
+      
+      <!-- Bottom Info Overlay -->
+      <div class="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-black/90 via-black/40 to-transparent flex flex-col justify-end items-center pb-4 z-20">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="text-rose-500 text-xl drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)]">❤️</span>
+          <h1 class="text-[28px] font-black text-white tracking-wide" style="text-shadow: 2px 2px 0px rgba(0,0,0,1), -1.5px -1.5px 0px rgba(0,0,0,1), 1.5px -1.5px 0px rgba(0,0,0,1), -1.5px 1.5px 0px rgba(0,0,0,1);">Magic Conny</h1>
+        </div>
+        <p class="text-[13px] text-white/90 font-bold tracking-wide" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">CV : Evan Hartwell</p>
+        
+        <!-- Eye Icon -->
+        <button class="absolute bottom-5 right-5 w-8 h-8 rounded-[10px] bg-black/40 backdrop-blur-md flex items-center justify-center border border-white/20 transition hover:bg-black/60">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Details Section -->
+    <div class="flex-1 bg-sp-card p-5 pt-0 flex flex-col">
+      
+      <div class="flex border-b-[1.5px] border-[#36395b] mb-4">
+        <button id="btn-level" onclick="switchTab('level')" class="tab-btn flex-1 pb-3 pt-2 text-[15px] font-bold text-sp-tab hover:text-white border-b-[3px] border-transparent relative transition text-center -mb-[1.5px]">Level</button>
+        <button id="btn-contract" onclick="switchTab('contract')" class="tab-btn flex-1 pb-3 pt-2 text-[15px] font-bold text-sp-tab hover:text-white border-b-[3px] border-transparent relative transition text-center -mb-[1.5px]">Contract</button>
+        <button id="btn-skin" onclick="switchTab('skin')" class="tab-btn flex-1 pb-3 pt-2 text-[15px] font-bold text-white border-b-[3px] border-white relative transition text-center -mb-[1.5px] drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">Skin</button>
+        <button id="btn-story" onclick="switchTab('story')" class="tab-btn flex-1 pb-3 pt-2 text-[15px] font-bold text-sp-tab hover:text-white border-b-[3px] border-transparent relative transition text-center -mb-[1.5px]">Story</button>
+      </div>
+
+      <!-- Level Tab Content -->
+      <div id="tab-level" class="hidden flex-col flex-1 pb-2 animate-[fadeInUp_0.3s_ease-out]">
+        <!-- Stars upgrade display -->
+        <div class="flex justify-center items-center gap-3 mb-3">
+          <div class="flex items-center gap-1.5 bg-[#252857] px-3 py-1.5 rounded-full shadow-inner border border-white/5">
+            <span class="text-[#fac658] text-[16px] drop-shadow-sm">⭐</span>
+            <span class="text-white font-black text-[15px]">X 7</span>
+          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-[#f47b0a] drop-shadow-sm" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+          <div class="flex items-center gap-1.5 bg-[#252857] px-3 py-1.5 rounded-full shadow-inner border border-white/5">
+            <span class="text-[#fac658] text-[16px] drop-shadow-sm">⭐</span>
+            <span class="text-white font-black text-[15px]">X 8</span>
+          </div>
+        </div>
+
+        <!-- Stat Card -->
+        <div class="bg-[#242756] rounded-[18px] p-3 flex flex-col items-center shadow-inner border border-white/5 mb-3">
+          <!-- Level Cap Info -->
+          <div class="flex items-center w-full justify-center gap-4 mb-3">
+            <span class="text-[12px] font-bold text-sp-tab/80 tracking-wider">Level Cap</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[#8e95df] font-bold bg-[#1e2049] px-2 py-0.5 rounded-[6px] text-[14px]">LV. 30</span>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-sp-tab" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+              <span class="text-[#64d0ff] font-bold bg-[#1e2049] px-2 py-0.5 rounded-[6px] text-[14px]">LV. 60</span>
             </div>
           </div>
 
-          <!-- Detail Tabs -->
-          <div class="flex border-b-[2px] border-[#36395b] mx-1 mb-3 relative">
-            <button class="detail-tab flex-1 pb-1.5 text-[14px] font-bold text-sp-label hover:text-white transition text-center" onclick="setTab(this)">Level</button>
-            <button class="detail-tab flex-1 pb-1.5 text-[14px] font-bold text-sp-label hover:text-white transition text-center" onclick="setTab(this)">Contract</button>
-            <button class="detail-tab active flex-1 pb-1.5 text-[14px] font-bold text-white transition text-center relative" onclick="setTab(this)">Skin</button>
-            <button class="detail-tab flex-1 pb-1.5 text-[14px] font-bold text-sp-label hover:text-white transition text-center" onclick="setTab(this)">Story</button>
+          <!-- Stats Grid -->
+          <div class="grid grid-cols-4 w-full gap-2 mb-3">
+            <div class="flex flex-col items-center justify-center gap-1 bg-[#1a1c3e] border border-white/5 rounded-[10px] py-1.5">
+              <span class="text-cyan-400 text-[15px] drop-shadow">💠</span>
+              <span class="text-[#5cd6ff] font-bold text-[13px]">+769</span>
+            </div>
+            <div class="flex flex-col items-center justify-center gap-1 bg-[#1a1c3e] border border-white/5 rounded-[10px] py-1.5">
+              <span class="text-pink-400 text-[15px] drop-shadow">📖</span>
+              <span class="text-[#5cd6ff] font-bold text-[13px]">+769</span>
+            </div>
+            <div class="flex flex-col items-center justify-center gap-1 bg-[#1a1c3e] border border-white/5 rounded-[10px] py-1.5">
+              <span class="text-rose-500 text-[15px] drop-shadow">❤️</span>
+              <span class="text-[#5cd6ff] font-bold text-[13px]">+769</span>
+            </div>
+            <div class="flex flex-col items-center justify-center gap-1 bg-[#1a1c3e] border border-white/5 rounded-[10px] py-1.5">
+              <span class="text-emerald-400 text-[15px] drop-shadow">☘️</span>
+              <span class="text-[#5cd6ff] font-bold text-[13px]">+769</span>
+            </div>
           </div>
 
-          <!-- Skin Preview Carousel Box -->
-          <div class="bg-[#212450] rounded-2xl pt-2 pb-2 px-2 mb-3 shadow-inner flex flex-col items-center justify-center relative overflow-hidden shrink-0">
-             
-             <!-- decorative bg ring -->
-             <div class="absolute inset-0 bg-[#2b2f63] opacity-50 z-0"></div>
-             
-             <!-- 3 character preview row -->
-             <div class="relative z-10 w-full flex items-center justify-center gap-1.5 xl:gap-2 mb-1.5 h-[80px] xl:h-[95px]">
-                
-                <!-- Left inactive -->
-                <div class="w-[50px] xl:w-[60px] h-[80%] bg-gradient-to-br from-indigo-900/60 to-purple-900/60 rounded-[12px] overflow-hidden opacity-60 border border-[#40467a] flex-shrink-0 relative">
-                  <div class="absolute inset-0 flex items-end justify-center">
-                    <img src="./assets/images/characters/娃娃12.png" class="w-[140%] h-[140%] object-contain object-bottom opacity-70">
+          <!-- Required Material (Mockup) -->
+          <div class="w-16 h-16 bg-gradient-to-br from-[#1b1e42] to-[#121430] rounded-2xl border-2 border-[#fac658] flex items-center justify-center shadow-[0_4px_15px_rgba(250,198,88,0.2)] relative mb-2">
+             <span class="text-3xl filter drop-shadow">📦</span>
+             <div class="absolute -top-1.5 -right-1.5 bg-red-500 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center pb-px">!</div>
+          </div>
+
+          <!-- Amount Control -->
+          <div class="flex items-center justify-center gap-6 w-full px-8">
+            <button class="w-[30px] h-[30px] rounded-full bg-[#3b3e6d] flex items-center justify-center hover:bg-[#4a4d80] transition shadow-inner">
+              <div class="w-3.5 h-[3px] bg-white rounded-full"></div>
+            </button>
+            <div class="flex items-baseline gap-1 font-black leading-none pt-1">
+              <span class="text-[#ffba3a] text-[22px] drop-shadow-sm">0</span>
+              <span class="text-white text-[16px]">/20</span>
+            </div>
+            <button class="w-[30px] h-[30px] rounded-full bg-[#48508e] flex items-center justify-center hover:bg-[#5861a5] transition shadow-inner">
+              <div class="relative w-3.5 h-3.5 flex items-center justify-center">
+                <div class="absolute w-full h-[3px] bg-white rounded-full"></div>
+                <div class="absolute h-full w-[3px] bg-white rounded-full"></div>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Confirm Button -->
+        <button onclick="switchTab('skin')" class="mt-auto w-full py-[12px] rounded-[16px] font-black text-[18px] text-[#5c3000] tracking-wide bg-gradient-to-b from-[#fed858] via-[#fba522] to-[#e4750a] shadow-[0_5px_15px_rgba(228,117,10,0.5)] hover:-translate-y-0.5 transition-transform">
+          Confirm
+        </button>
+      </div>
+
+      <!-- Contract Tab Content (Hidden by default) -->
+      <div id="tab-contract" class="hidden flex-col flex-1 pb-2 animate-[fadeInUp_0.3s_ease-out]">
+        
+        <!-- Contract Card -->
+        <div class="bg-[#242756] rounded-[18px] flex flex-col mb-4 overflow-hidden border border-[#3b3e6d]/50 shadow-[0_5px_15px_rgba(0,0,0,0.2)]">
+          <div class="flex h-[130px]">
+            <!-- Character Thumbnail -->
+            <div class="w-[120px] bg-gray-800 shrink-0 h-full relative border-r border-[#3b3e6d]/30">
+              <img src="./assets/images/characters/娃娃12.png" alt="Skin" class="absolute inset-0 w-full h-full object-cover">
+            </div>
+            
+            <!-- Requirements -->
+            <div class="flex-1 p-3 flex flex-col justify-center pl-4 bg-gradient-to-r from-[#242756] to-[#1e2049]">
+              <div class="flex justify-between items-center mb-3">
+                <span class="text-[12px] font-bold text-[#8a8db9]">Requirements</span>
+                <span class="text-[13px] font-bold text-white flex items-center gap-1 drop-shadow-sm">3 <span class="text-[#fac658] drop-shadow-sm">⭐</span> Unlock</span>
+              </div>
+              
+              <div class="flex gap-2.5">
+                <!-- Item 1 -->
+                <div class="w-[66px] h-[66px] rounded-[14px] bg-gradient-to-b from-[#7064ff] via-[#483fd8] to-[#121430] border border-white/20 flex flex-col items-center justify-center relative shadow-[inset_0_2px_10px_rgba(255,255,255,0.2)] overflow-hidden">
+                  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3)_0%,transparent_60%)] z-10"></div>
+                  <span class="text-[28px] drop-shadow-[0_4px_4px_rgba(0,0,0,0.6)] relative z-0 mt-1">⭐</span>
+                  <div class="absolute bottom-1 w-full text-center z-20 flex justify-center items-baseline px-1">
+                    <span class="text-[#00ff44] text-[13px] font-black drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] leading-none" style="-webkit-text-stroke: 0.5px rgba(0,0,0,0.5);">50</span>
+                    <span class="text-white text-[10px] font-black drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] leading-none">/1</span>
                   </div>
                 </div>
+                
+                <!-- Item 2 -->
+                <div class="w-[66px] h-[66px] rounded-[14px] bg-gradient-to-b from-[#7064ff] via-[#483fd8] to-[#121430] border border-white/20 flex flex-col items-center justify-center relative shadow-[inset_0_2px_10px_rgba(255,255,255,0.2)] overflow-hidden">
+                  <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.3)_0%,transparent_60%)] z-10"></div>
+                  <span class="text-[28px] drop-shadow-[0_4px_4px_rgba(0,0,0,0.6)] relative z-0 mt-1">🌟</span>
+                  <div class="absolute bottom-1 w-full text-center z-20 flex justify-center items-center px-1">
+                    <span class="text-white text-[13px] font-black drop-shadow-[0_2px_2px_rgba(0,0,0,0.8)] leading-none" style="-webkit-text-stroke: 0.5px rgba(0,0,0,0.5);">40w</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
+        <!-- Speech Bubble -->
+        <div class="relative bg-[#ebefff] text-[#555a90] rounded-[18px] p-4 text-[13px] font-bold leading-relaxed shadow-lg mx-1 mb-5 border-b-[4px] border-[#c5ccff]">
+          <!-- Speech Arrow -->
+          <div class="absolute -top-3 left-10 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[14px] border-b-[#ebefff]"></div>
+          Would you like to form a contract with me?<br>
+          Fulfilling the pact will unleash my power and unlock a <span class="text-[#ff5a9a]">special outfit</span> for you!
+        </div>
+
+        <!-- Contract Button -->
+        <button class="mt-auto w-full py-[12px] rounded-[16px] font-black text-[18px] text-[#5c3000] tracking-wide bg-gradient-to-b from-[#fed858] via-[#fba522] to-[#e4750a] shadow-[0_5px_15px_rgba(228,117,10,0.5)] hover:-translate-y-0.5 transition-transform uppercase">
+          contract
+        </button>
+
+      </div>
+
+      <!-- Skin Tab Content (Hidden by default) -->
+      <div id="tab-skin" class="flex flex-col flex-1 pb-2 animate-[fadeInUp_0.3s_ease-out]">
+        
+        <!-- Gallery Container -->
+        <div class="bg-[#242756] rounded-[18px] flex-1 flex flex-col items-center justify-center pt-8 pb-5 mb-5 border border-[#3b3e6d]/50 shadow-[inset_0_5px_20px_rgba(0,0,0,0.2)] relative overflow-hidden">
+            
+            <!-- decorative bg ring -->
+            <div class="absolute inset-0 bg-[#2b2f63] opacity-30 z-0 pointer-events-none"></div>
+
+            <!-- Carousel row -->
+            <div class="relative z-10 w-full flex items-center justify-center h-[170px] mb-5">
+                
+                <!-- Left inactive -->
+                <div class="w-[90px] h-[130px] bg-gradient-to-br from-[#3b3e7a] to-[#1a1c40]  overflow-hidden opacity-60 relative -mr-6 z-0 transform scale-90 border-[1.5px] border-[#4b4e90]/40 shadow-lg">
+                  <div class="absolute inset-0 flex items-end justify-center">
+                    <img src="./assets/images/characters/娃娃12.png" class="absolute w-[180%] bottom-0 left-1/2 -translate-x-1/2 object-contain mix-blend-luminosity opacity-40">
+                    <img src="./assets/images/characters/娃娃12.png" class="absolute w-[180%] bottom-0 left-1/2 -translate-x-1/2 object-contain opacity-70">
+                  </div>
+                </div>
+                
                 <!-- Active Center -->
-                <div class="w-[85px] xl:w-[100px] h-[100%] bg-gradient-to-b from-[#1b204f] to-[#12153b] rounded-[16px] overflow-hidden shadow-[0_4px_15px_rgba(245,166,35,0.4)] border-2 border-[#ffba3a] z-20 relative ring-4 ring-[#ffba3a]/20">
-                   <div class="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-[#ffba3a]/20 to-transparent"></div>
-                   <div class="absolute inset-0 flex items-end justify-center pb-1">
-                     <img src="./assets/images/characters/role (1).png" alt="Skin" class="w-[125%] h-[125%] object-contain object-bottom drop-shadow-[0_5px_8px_rgba(0,0,0,0.6)]">
+                <div class="w-[125px] h-[170px] bg-gradient-to-b from-[#5659a8] to-[#121430] rounded-[18px] overflow-hidden shadow-[0_20px_35px_rgba(0,0,0,0.5)] border-[3px] border-[#ffba3a] z-20 relative ring-4 ring-[#ffba3a]/20">
+                   <div class="absolute inset-x-0 bottom-0 top-1/2 bg-gradient-to-t from-[#ffba3a]/20 to-transparent pointer-events-none"></div>
+                   <div class="absolute inset-0 flex items-end justify-center pointer-events-none">
+                     <img src="./assets/images/characters/娃娃12.png" class="absolute w-[180%] bottom-0 left-1/2 -translate-x-1/2 object-contain drop-shadow-[0_10px_10px_rgba(0,0,0,0.8)] filter brightness-[1.05]">
                    </div>
                 </div>
 
                 <!-- Right inactive -->
-                <div class="w-[50px] xl:w-[60px] h-[80%] bg-gradient-to-bl from-blue-900/60 to-cyan-900/60 rounded-[12px] overflow-hidden opacity-60 border border-[#40467a] flex-shrink-0 relative">
+                <div class="w-[90px] h-[130px] bg-gradient-to-bl from-[#3b3e7a] to-[#1a1c40]  overflow-hidden opacity-60 relative -ml-6 z-0 transform scale-90 border-[1.5px] border-[#4b4e90]/40 shadow-lg">
                   <div class="absolute inset-0 flex items-end justify-center">
-                    <img src="./assets/images/characters/娃娃14.png" class="w-[140%] h-[140%] object-contain object-bottom opacity-70">
+                    <img src="./assets/images/characters/娃娃12.png" class="absolute w-[180%] bottom-0 left-1/2 -translate-x-1/2 object-contain mix-blend-luminosity opacity-40">
+                    <img src="./assets/images/characters/娃娃12.png" class="absolute w-[180%] bottom-0 left-1/2 -translate-x-1/2 object-contain opacity-70">
                   </div>
                 </div>
-             </div>
-             
-             <p class="text-center text-[14px] font-bold tracking-wide z-10 text-white leading-none">Skin Name</p>
-          </div>
+            </div>
 
-          <!-- Level Up Button -->
-          <button onclick="window.location.href='player-information.html'" class="mb-4 flex-shrink-0 w-full py-[12px] rounded-[14px] font-black text-[18px] text-[#5c3000] tracking-wide bg-gradient-to-b from-[#fed858] via-[#fba522] to-[#e4750a] shadow-[0_5px_20px_rgba(228,117,10,0.5)] hover:-translate-y-0.5 transition-transform">
-            Level up
-          </button>
+            <p class="text-[#8e95df] text-[15px] font-bold tracking-wide z-10 drop-shadow-md">Skin Name</p>
+        </div>
+
+        <!-- Level Up Button -->
+        <button onclick="switchTab('level')" class="mt-auto w-full py-[12px] rounded-[16px] font-black text-[18px] text-[#5c3000] tracking-wide bg-gradient-to-b from-[#fed858] via-[#fba522] to-[#e4750a] shadow-[0_5px_15px_rgba(228,117,10,0.5)] hover:-translate-y-0.5 transition-transform">
+          Level up
+        </button>
+
+      </div>
+
+      <!-- Story Tab Content (Hidden by default) -->
+      <div id="tab-story" class="hidden flex-col flex-1 pb-2 animate-[fadeInUp_0.3s_ease-out]">
+        
+        <!-- Story Toggle Buttons -->
+        <div class="flex justify-between gap-3 mb-6 px-1">
+          <button id="btn-sub-profile" onclick="switchStorySubTab('profile')" class="flex-1 py-1.5 rounded-full text-[12px] font-bold transition bg-[#4d4ee1] text-white shadow-[0_2px_8px_rgba(77,78,225,0.4)] border border-[#5d5ef0]">Profile</button>
+          <button id="btn-sub-story" onclick="switchStorySubTab('story')" class="flex-1 py-1.5 rounded-full text-[12px] font-bold transition bg-[#2a2c53] text-[#8a8db9] border border-[#3e426e] hover:bg-[#343663] hover:text-white">Story</button>
+          <button id="btn-sub-voice" onclick="switchStorySubTab('voice')" class="flex-1 py-1.5 rounded-full text-[12px] font-bold transition bg-[#2a2c53] text-[#8a8db9] border border-[#3e426e] hover:bg-[#343663] hover:text-white">Voice</button>
+        </div>
+
+        <!-- 1. Profile Sub-view -->
+        <div id="sub-profile" class="flex flex-col gap-6 px-3 animate-[fadeInUp_0.2s_ease-out]">
+          <div class="grid grid-cols-2 gap-x-6 gap-y-6">
+            <!-- Birthday -->
+            <div class="flex flex-col">
+              <span class="text-[#8a8db9] text-[12px] font-bold mb-1 ml-1 drop-shadow-sm">Birthday</span>
+              <div class="bg-[#191b3b] shadow-inner border border-white/5 rounded-[6px] py-1 text-center">
+                <span class="text-[#e2e4ff] text-[13px] font-medium tracking-wide">3 June</span>
+              </div>
+            </div>
+            <!-- Height -->
+            <div class="flex flex-col">
+              <span class="text-[#8a8db9] text-[12px] font-bold mb-1 ml-1 drop-shadow-sm">Height</span>
+              <div class="bg-[#191b3b] shadow-inner border border-white/5 rounded-[6px] py-1 text-center">
+                <span class="text-[#e2e4ff] text-[13px] font-medium tracking-wide">161 cm</span>
+              </div>
+            </div>
+            <!-- Bloody Type -->
+            <div class="flex flex-col">
+              <span class="text-[#8a8db9] text-[12px] font-bold mb-1 ml-1 drop-shadow-sm">Bloody Type</span>
+              <div class="bg-[#191b3b] shadow-inner border border-white/5 rounded-[6px] py-1 text-center">
+                <span class="text-[#e2e4ff] text-[13px] font-medium tracking-wide">O</span>
+              </div>
+            </div>
+            <!-- Hobbies -->
+            <div class="flex flex-col">
+              <span class="text-[#8a8db9] text-[12px] font-bold mb-1 ml-1 drop-shadow-sm">Hobbies</span>
+              <div class="bg-[#191b3b] shadow-inner border border-white/5 rounded-[6px] py-1 text-center">
+                <span class="text-[#e2e4ff] text-[13px] font-medium tracking-wide">Mange Shop</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Story Sub-view -->
+        <div id="sub-story" class="hidden flex-col animate-[fadeInUp_0.2s_ease-out]">
+          <div class="bg-[#242756] rounded-[18px] p-5 shadow-inner border border-[#3b3e6d]/50 max-h-[300px] overflow-y-auto custom-scrollbar">
+            <p class="text-[#b1b5e2] text-[12.5px] font-medium leading-[1.65] mb-4">
+              As the only daughter of the prestigious Jin family, Jin Qilin grew up carrying the weight of tradition and ex-pectation. But following the path laid out for her never felt right.
+            </p>
+            <p class="text-[#b1b5e2] text-[12.5px] font-medium leading-[1.65] mb-4">
+              Determined to live on her own terms, she secretly took part-time jobs and learned to invest, saving just enough money to slip away from home. What began as a small act of rebellion soon became a journey of self-discovery.
+            </p>
+            <p class="text-[#b1b5e2] text-[12.5px] font-medium leading-[1.65]">
+              By a twist of fate, her wandering footsteps led her to Playstar Academy- a place where she just might
+            </p>
+          </div>
+        </div>
+
+        <!-- 3. Voice Sub-view -->
+        <div id="sub-voice" class="hidden flex-col animate-[fadeInUp_0.2s_ease-out]">
+          <div class="bg-[#242756] rounded-[18px] p-4 flex flex-col gap-3 shadow-inner border border-[#3b3e6d]/50">
+            <!-- Voice line 1 -->
+            <div class="flex items-center justify-between bg-[#2a2c53] rounded-full pl-3 pr-1 py-1 border border-white/5 shadow-inner hover:bg-[#313460] transition cursor-pointer group">
+              <div class="flex items-center gap-2.5 opacity-80 group-hover:opacity-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-[15px] w-[15px] text-[#8a8db9]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                <span class="text-[#d8dbff] text-[12.5px] font-medium tracking-wide">Unlocked Character Voice</span>
+              </div>
+              <button class="bg-[#4a4fe0] hover:bg-[#5a5ff0] active:scale-95 transition-all rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+            
+            <!-- Voice line 2 -->
+            <div class="flex items-center justify-between bg-[#2a2c53] rounded-full pl-3 pr-1 py-1 border border-white/5 shadow-inner hover:bg-[#313460] transition cursor-pointer group">
+              <div class="flex items-center gap-2.5 opacity-80 group-hover:opacity-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-[15px] w-[15px] text-[#8a8db9]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                <span class="text-[#d8dbff] text-[12.5px] font-medium tracking-wide">Unlocked Character Voice</span>
+              </div>
+              <button class="bg-[#4a4fe0] hover:bg-[#5a5ff0] active:scale-95 transition-all rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+
+            <!-- Voice line 3 -->
+            <div class="flex items-center justify-between bg-[#2a2c53] rounded-full pl-3 pr-1 py-1 border border-white/5 shadow-inner hover:bg-[#313460] transition cursor-pointer group">
+              <div class="flex items-center gap-2.5 opacity-80 group-hover:opacity-100 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-[15px] w-[15px] text-[#8a8db9]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+                <span class="text-[#d8dbff] text-[12.5px] font-medium tracking-wide">Unlocked Character Voice</span>
+              </div>
+              <button class="bg-[#4a4fe0] hover:bg-[#5a5ff0] active:scale-95 transition-all rounded-full w-7 h-7 flex items-center justify-center flex-shrink-0 shadow-md">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+  
         </div>
 
       </div><!-- /content -->
@@ -438,5 +687,86 @@
     }
   </script>
 
+<script>
+    function switchTab(tabName) {
+      // Hide all contents by clearing flex and adding hidden
+      ['level', 'contract', 'skin', 'story'].forEach(tab => {
+        const el = document.getElementById('tab-' + tab);
+        if(el) {
+          el.classList.add('hidden');
+          el.classList.remove('flex');
+        }
+      });
+      
+      // Show targeted content with flex layout
+      const content = document.getElementById('tab-' + tabName);
+      if(content) {
+        content.classList.remove('hidden');
+        content.classList.add('flex');
+      }
+      
+      // Reset all buttons
+      const tabs = document.querySelectorAll('.tab-btn');
+      tabs.forEach(t => {
+        t.className = 'tab-btn flex-1 pb-3 pt-2 text-[15px] font-bold text-sp-tab hover:text-white border-b-[3px] border-transparent relative transition text-center -mb-[1.5px]';
+      });
+      
+      // Highlight active button (apply glow styling uniformly across all tabs)
+      const activeBtn = document.getElementById('btn-' + tabName);
+      if(activeBtn) {
+        activeBtn.className = 'tab-btn flex-1 pb-3 pt-2 text-[15px] font-bold text-white border-b-[3px] border-white relative transition text-center -mb-[1.5px] drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]';
+      }
+    }
+
+    function switchStorySubTab(subName) {
+      // Hide all sub-views
+      ['profile', 'story', 'voice'].forEach(t => {
+        const content = document.getElementById('sub-' + t);
+        if(content) {
+          content.classList.add('hidden');
+          content.classList.remove('flex');
+        }
+        
+        // Reset sub buttons
+        const btn = document.getElementById('btn-sub-' + t);
+        if(btn) {
+           btn.className = 'flex-1 py-1.5 rounded-full text-[12px] font-bold transition bg-[#2a2c53] text-[#8a8db9] border border-[#3e426e] hover:bg-[#343663] hover:text-white';
+        }
+      });
+      
+      // Show targeted sub-view
+      const activeContent = document.getElementById('sub-' + subName);
+      if(activeContent) {
+        activeContent.classList.remove('hidden');
+        activeContent.classList.add('flex');
+      }
+      
+      // Highlight active sub button
+      const activeBtn = document.getElementById('btn-sub-' + subName);
+      if(activeBtn) {
+        activeBtn.className = 'flex-1 py-1.5 rounded-full text-[12px] font-bold transition bg-[#4d4ee1] text-white shadow-[0_2px_8px_rgba(77,78,225,0.4)] border border-[#5d5ef0]';
+      }
+    }
+  </script>
+
+  <style>
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    /* Custom Scrollbar for Story Text */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #483fd8;
+      border-radius: 4px;
+    }
+  </style>
 </body>
 </html>
